@@ -8,13 +8,7 @@ UIv1.initUI = () => {
 }
 
 UIv1.drawBoard = (board, players) => {
-   
-    // for (var i = players.length - 1; i >= 0; i--) {
-    //     var j = Math.floor(Math.random() * (i + 1));
-    //     var temp = players[i];
-    //     players[i] = players[j];
-    //     players[j] = temp;
-    // }       
+
     
     console.log(board);
     if (board !== undefined) {

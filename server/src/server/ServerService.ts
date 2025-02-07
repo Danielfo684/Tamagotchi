@@ -9,7 +9,8 @@ export class ServerService {
     static messages = {
         out: {
             new_player: "NEW_PLAYER",
-            room_status: "ROOM_STATUS"
+            room_status: "ROOM_STATUS",
+            players_ready: "PLAYERS_READY"
         } 
     }
 

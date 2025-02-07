@@ -8,7 +8,9 @@ export enum GameStates {
 export enum Messages {
     BOARD = "BOARD",
     NEW_PLAYER = "NEW_PLAYER",
-    ROOM_STATUS = "ROOM_STATUS"
+    ROOM_STATUS = "ROOM_STATUS",
+    PLAYERS_UPDATE = "PLAYERS_UPDATE",
+    ASIGN_PLAYER = "ASIGN_PLAYER"
 }
 
 export interface Game {

@@ -33,20 +33,20 @@ export class GameService {
     }
 
     public addPlayer(player: Player): boolean {
-        const room: Room = RoomService.getInstance().addPlayer(player);
-        //ServerService.getInstance().sendMessage(room.name,ServerService.messages.out.new_player,"new player");
-        ServerService.getInstance().sendMessage(room.name, Messages.ROOM_STATUS, {players: room.players.length} )
-        console.log(player.id.);
-        ServerService.getInstance().sendMessage(room.name, Messages.NEW_PLAYER,  {
-            x: player.x,
-            y: player.y,
-            state: player.state,
-            direction: player.direction,
-            visibility: player.visibility
-        });
         
+        const room: Room = RoomService.getInstance().addPlayer(player);
+        
+        //ServerService.getInstance().sendMessage(room.name,ServerService.messages.out.new_player,"new player");
+        // ServerService.getInstance().sendMessage(room.name, Messages.NEW_PLAYER, {
+        //     id: player.id,
+        //     x: player.x,
+        //     y: player.y,
+        //     state: player.state,
+        //     direction: player.direction,
+        //     visibility: player.visibility
+        // });
         const genRanHex = (size: Number) => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
-        if (room.players.length == 4) {
+        if (room.players.length == 2) {
             const game: Game = {
                 id: "game" + genRanHex(128),
                 state: GameStates.WAITING,
@@ -61,12 +61,42 @@ export class GameService {
             if (room.game) {
                 room.game.state = GameStates.PLAYING;
                 if (ServerService.getInstance().isActive()) {
-                    ServerService.getInstance().sendMessage(room.name, Messages.BOARD, room.game.board);
+                    ServerService.getInstance().sendMessage(room.name, Messages.BOARD, room.game.board,
+                    
+                    );
+
+                    ServerService.getInstance().sendMessage(room.name, Messages.ASIGN_PLAYER, room.players.map((player, index) => ({
+                        assignedPlayer: `player${index + 1}`
+                    })));
+
+                    ServerService.getInstance().sendMessage(room.name, Messages.PLAYERS_UPDATE, [{
+                        name: 'player1',
+                        player: this.mapPlayer(room.players[0])
+                    },
+                {
+                    name: 'player2',
+                    player: this.mapPlayer(room.players[1])
+                }
+                // ,
+                // {
+                //     name: 'player3',
+                //     player: this.mapPlayer(room.players[2])
+                // }
+                ]);
                 }
             }
             return true;
         }
 
         return false;
+    }
+    private mapPlayer(player: Player) {
+        return {
+            x: player.x,
+            y: player.y,
+            state: player.state,
+            direction: player.direction,
+            visibility: player.visibility
+        }
     }
 }

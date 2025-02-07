@@ -15,7 +15,10 @@ export class GameService {
 
     #actionsList = {
         "NEW_PLAYER" : this.do_newPlayer.bind(this),
-        "BOARD" : this.do_newBoard.bind(this)
+        "BOARD" : this.do_newBoard.bind(this),
+        "PLAYERS_UPDATE" : this.do_updatePlayers.bind(this),
+        "ASIGN_PLAYER" : this.do_asignPlayer.bind(this)
+        // "ROOM_STATUS" : this.do_newBoard.bind(this)
     };
 
     constructor(ui){
@@ -55,15 +58,26 @@ export class GameService {
     };
 
     async do_newPlayer (payload) {
-        console.log('los players');
+        console.log('new player');
 
         console.log(payload);
         this.#players.push(payload);
         console.log(this.#players);
 
     };
+    
+    async do_asignPlayer (payload) {
+        console.log(payload);
+    };
+
+
+    async do_updatePlayers (payload) {
+        console.log(payload);
+
+    };
 
     async do_newBoard(payload) {
+        console.log(payload);
         this.#board.build(payload);
         this.#ui.drawBoard(this.#board.map, this.#players);
 
