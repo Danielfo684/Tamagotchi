@@ -34,13 +34,7 @@ export const ConnectionHandler = {
         })
         // no he encontrado la forma de enlazar limpiamente el socket emit con 
         // la UI y mantenerlos separados, voy a llamar al socket emit directamente en UI
-        emitData: (message, payload) => {
-            if (ConnectionHandler.socket) {
-                ConnectionHandler.socket.emit(message, payload);
-            } else {
-                console.error("Socket is not initialized.");
-            }
-        }
+        
     }
 }
 

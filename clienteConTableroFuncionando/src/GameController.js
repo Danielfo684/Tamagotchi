@@ -5,7 +5,6 @@ export class GameController {
     #states = {
         RIGHT : 0,
         BAD : 1,
-       
     };
     #state = null;
     #gameService = null;
@@ -15,6 +14,7 @@ export class GameController {
         this.#gameService = new GameService(ui);
         ConnectionHandler.init(url, this, () => {
             this.#state = this.#states.RIGHT;
+            ui.setConnectionHandler(ConnectionHandler.socket); 
         }, () => {
             this.#state = this.#states.BAD;
         });

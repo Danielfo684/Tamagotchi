@@ -8,6 +8,12 @@ UIv1.initUI = () => {
     base.classList.add("board");
 }
 
+
+UIv1.setConnectionHandler = (connectionHandler) => {
+    UIv1.connectionHandler = connectionHandler;
+}
+
+
 UIv1.drawBoard = (board, players) => {
 
 
@@ -74,6 +80,8 @@ UIv1.drawBoard = (board, players) => {
         attackButton.appendChild(swordIcon);
 
         attackButton.addEventListener('click', () => {
+            let playerTile = document.querySelector(`[data-element="${player.player.id}"]`);
+
             console.log('Attack button clicked');
             let x = player.player.x;
             let y = player.player.y;
@@ -90,11 +98,25 @@ UIv1.drawBoard = (board, players) => {
                     --y;
                     break;
             }
+            anime ({
+                targets: playerTile.querySelector('img'),
+                translateX: [0, 50],
+                duration: 300,
+                easing: 'easeInOutQuad'
+            });
+            anime ({
+                targets: playerTile.querySelector('img'),
+                translateX: [50, 0],
+                duration: 300,
+                easing: 'easeInOutQuad'
+            });
+
             player.player.status = 'attacking';
             setTimeout(() => {
                 player.player.status = 'idle';
             }, 100);
-            ConnectionHandler.emitData("ATTACK", UIv1.mapPlayer(player.player)
+            console.log(ConnectionHandler.socket);
+            UIv1.ConnectionHandler.socket("ATTACK", { x, y }
             );
     });
 
@@ -126,7 +148,7 @@ UIv1.drawBoard = (board, players) => {
                 break;
         }
         UIv1.movePlayer(player.player);
-        ConnectionHandler.init("MOVE", UIv1.mapPlayer(player.player));
+        UIv1.ConnectionHandler.socket.emit("MOVE", UIv1.mapPlayer(player.player));
     });
 
     const rotateButton = document.createElement('button');
@@ -156,7 +178,7 @@ UIv1.drawBoard = (board, players) => {
                 break;
         }
         console.log(`Player direction: ${player.player.direction}`);
-        ConnectionHandler.emitData("ROTATE", UIv1.mapPlayer(player.player));
+        UIv1.ConnectionHandler.emitData("ROTATE", UIv1.mapPlayer(player.player));
 
     });
 
