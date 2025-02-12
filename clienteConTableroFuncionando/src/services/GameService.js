@@ -1,5 +1,6 @@
 import { Board } from "../entities/Board.js";
 import { Queue } from "../Queue.js";
+import { ConnectionHandler } from "./ConnectionHandler.js";
 export class GameService {
     #states = {
         WAITING : 0,
@@ -12,12 +13,17 @@ export class GameService {
     #queue = null;
     #state = null;
     #parallel = null;
+    #myPlayer = null;
+    #startingPositions = null;
+
 
     #actionsList = {
         "NEW_PLAYER" : this.do_newPlayer.bind(this),
         "BOARD" : this.do_newBoard.bind(this),
         "PLAYERS_UPDATE" : this.do_updatePlayers.bind(this),
-        "ASIGN_PLAYER" : this.do_asignPlayer.bind(this)
+        "ASIGN_PLAYER" : this.do_asignPlayer.bind(this),
+        "ASIGN_MY_PLAYER" : this.do_asignMyPlayer.bind(this),
+        "SEND_UPDATE" : this.do_sendMyPlayer.bind(this)
         // "ROOM_STATUS" : this.do_newBoard.bind(this)
     };
 
@@ -28,6 +34,8 @@ export class GameService {
         this.#parallel = null;
         this.checkScheduler();
         this.#ui = ui;
+        console.log(this.#board);
+        this.#startingPositions = [[0,0], [0,9], [9,0], [9,9]];
     }
 
     checkScheduler() {
@@ -72,7 +80,29 @@ export class GameService {
 
 
     async do_updatePlayers (payload) {
-        console.log(payload);
+        console.log(this.#startingPositions);
+        console.log(this.#players);
+
+       if (this.#players.length === 0) {
+         payload.forEach(item => {
+            console.log("updating player " + item.name);
+             this.#players.push(item.player);
+         });
+      
+         console.log(this.#players);
+         this.#players.map((player, index) => {
+         player.x = this.#startingPositions[index][0];
+         player.y =  this.#startingPositions[index][1];
+      });
+        } else {
+            // payload.forEach(item => {
+            //     const player = this.#players.find(player => player.id === item.player.id);
+            //     player.x = item.player.x;
+            //     player.y = item.player.y;
+            // });
+            // this.#ui.movePlayer(this.#players);
+        }
+     
 
     };
 
@@ -80,7 +110,20 @@ export class GameService {
         console.log(payload);
         this.#board.build(payload);
         this.#ui.drawBoard(this.#board.map, this.#players);
+        this.#ui.playerButtons(this.#myPlayer);
 
+
+    }
+
+    async do_asignMyPlayer(payload) {
+       this.#myPlayer = payload;
+       console.log(this.#myPlayer);
+    }
+
+    async do_sendMyPlayer(payload) {
+        ConnectionHandler.emitData("SEND_UPDATE", {
+            player: this.#myPlayer
+        });
     }
     
 }

@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 import { Directions, Player, PlayerStates } from "../player/entities/Player";
-import { Room } from "../room/entities/Room";
+import { Room, RoomConfig } from "../room/entities/Room";
 import { RoomService } from "../room/RoomService";
 import { Game, GameStates, Messages } from "./entities/Game";
 import { BoardBuilder } from "./BoardBuilder";
@@ -27,26 +27,20 @@ export class GameService {
             x: 0,
             y: 0,
             state: PlayerStates.Idle,
-            direction: Directions.Up,
+            direction: Directions.Right,
             visibility: true
         }
     }
 
     public addPlayer(player: Player): boolean {
-        
+
         const room: Room = RoomService.getInstance().addPlayer(player);
-        
-        //ServerService.getInstance().sendMessage(room.name,ServerService.messages.out.new_player,"new player");
-        // ServerService.getInstance().sendMessage(room.name, Messages.NEW_PLAYER, {
-        //     id: player.id,
-        //     x: player.x,
-        //     y: player.y,
-        //     state: player.state,
-        //     direction: player.direction,
-        //     visibility: player.visibility
-        // });
+
+        ServerService.getInstance().sendMessage(room.name, Messages.ASIGN_MY_PLAYER, {
+            player: this.mapPlayer(player)
+        });
         const genRanHex = (size: Number) => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
-        if (room.players.length == 2) {
+        if (room.players.length == RoomConfig.maxRoomPlayers) {
             const game: Game = {
                 id: "game" + genRanHex(128),
                 state: GameStates.WAITING,
@@ -61,28 +55,37 @@ export class GameService {
             if (room.game) {
                 room.game.state = GameStates.PLAYING;
                 if (ServerService.getInstance().isActive()) {
+                  
+
+                    // ServerService.getInstance().sendMessage(room.name, Messages.ASIGN_PLAYER, {
+                    //     message: "id assigned to player",
+                    //     player1: room.players[0].id.id,
+                        // player2: room.players[1].id.id,
+                        // player3: room.players[2].id.id,
+                        // player4: room.players[3].id.id
+
+                    // }
+                    // );
+
+                    ServerService.getInstance().sendMessage(room.name, Messages.PLAYERS_UPDATE,[ {
+                        name: '1',
+                        player: this.mapPlayer(room.players[0]),
+
+                    }
+                        //     ,
+                        // {
+                        //     name: '2',
+                        //     player: this.mapPlayer(room.players[1])
+                        // }
+                        // ,
+                        // {
+                        //     name: '3',
+                        //     player: this.mapPlayer(room.players[2])
+                        // }
+                    ]);
                     ServerService.getInstance().sendMessage(room.name, Messages.BOARD, room.game.board,
-                    
+
                     );
-
-                    ServerService.getInstance().sendMessage(room.name, Messages.ASIGN_PLAYER, room.players.map((player, index) => ({
-                        assignedPlayer: `player${index + 1}`
-                    })));
-
-                    ServerService.getInstance().sendMessage(room.name, Messages.PLAYERS_UPDATE, [{
-                        name: 'player1',
-                        player: this.mapPlayer(room.players[0])
-                    },
-                {
-                    name: 'player2',
-                    player: this.mapPlayer(room.players[1])
-                }
-                // ,
-                // {
-                //     name: 'player3',
-                //     player: this.mapPlayer(room.players[2])
-                // }
-                ]);
                 }
             }
             return true;
@@ -92,6 +95,7 @@ export class GameService {
     }
     private mapPlayer(player: Player) {
         return {
+            id: player.id.id,
             x: player.x,
             y: player.y,
             state: player.state,

@@ -4,12 +4,11 @@ export enum Directions {
     Up = "up", 
     Down = "down",
     Left = "left",
-    Right = "right",
-    Idle = "idle"
+    Right = "right"
 }
 
 export enum PlayerStates {
-    No_Connected, Idle, Moving, Hidden, Dead
+    No_Connected, Idle, Moving, Hidden, Dead, Attacking
 }
 
 export interface Player {

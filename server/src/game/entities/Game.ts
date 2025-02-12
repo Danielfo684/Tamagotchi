@@ -10,7 +10,11 @@ export enum Messages {
     NEW_PLAYER = "NEW_PLAYER",
     ROOM_STATUS = "ROOM_STATUS",
     PLAYERS_UPDATE = "PLAYERS_UPDATE",
-    ASIGN_PLAYER = "ASIGN_PLAYER"
+    // ASIGN_PLAYER = "ASIGN_PLAYER",
+    ASIGN_MY_PLAYER = "ASIGN_MY_PLAYER",
+    ATTACK = "ATTACK",
+    MOVE = "MOVE",
+    ROTATE = "ROTATE"
 }
 
 export interface Game {

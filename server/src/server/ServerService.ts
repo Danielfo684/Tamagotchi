@@ -2,7 +2,7 @@ import { DefaultEventsMap, Server, Socket } from 'socket.io';
 import http from 'http';
 import { GameService } from '../game/GameService';
 import { AnyTxtRecord } from 'dns';
-
+import {RoomService } from '../room/RoomService';
 export class ServerService {
     private io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any> | null;
     private active : boolean;
@@ -16,12 +16,16 @@ export class ServerService {
 
     public inputMessage = [
             {
-                type: "HELLO",
-                do: this.doHello
+                type: "ATTACK",
+                do: this.doAttack
             },
             {
-                type: "BYE",
-                do: this.doBye
+                type: "ROTATE",
+                do: this.doRotate
+            },
+            {
+                type: "MOVE",
+                do: this.doMove
             }
         ];
 
@@ -61,7 +65,11 @@ export class ServerService {
 
             socket.on('disconnect', () => {
                 console.log('Un cliente se ha desconectado:', socket.id);
+                RoomService.getInstance().removePlayer(socket.id);
             });
+        
+        
+        
         });
     }
 
@@ -88,13 +96,18 @@ export class ServerService {
         return this.active;
     }
 
-    private doHello(data: String) {
-        console.log("Hola");
+    private doAttack(data: String) {
+        console.log("Attack");
         console.log(data);
     }
 
-    private doBye(data: String) {
-        console.log("Adios");
+    private doRotate(data: String) {
+        console.log("Rotate");
+        console.log(data);
+    }
+
+    private doMove(data: String) {
+        console.log("Move");
         console.log(data);
     }
 }

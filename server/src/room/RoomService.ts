@@ -17,7 +17,7 @@ export class RoomService {
         return this.instance;
     }
 
-    private getRoom() : Room {
+    private getRoom(): Room {
         const room = this.rooms.find((item) => item.occupied == false);
         if (room == undefined) {
             const genRanHex = (size: Number) => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
@@ -33,21 +33,24 @@ export class RoomService {
         return room;
     }
 
-    public addPlayer(player: Player) : Room {
-        const room : Room = this.getRoom();
+    public addPlayer(player: Player): Room {
+        const room: Room = this.getRoom();
         room.players.push(player);
-        ServerService.getInstance().addPlayerToRoom(player.id,room.name);
+        ServerService.getInstance().addPlayerToRoom(player.id, room.name);
         if (room.players.length == RoomConfig.maxRoomPlayers) room.occupied = true;
-        return room;  
+        return room;
     }
-    public removePlayer(player: Player) : void {
-        
-        // this.rooms.find((room) => {room.players.includes(player);
+    public removePlayer(playerId : String): void {
+        this.rooms.forEach((room) => {
+                room.players = room.players.filter((item) => item.id.id !== playerId);
+        });
+
+        //  this.rooms.find((room) => {room.players.find(player.id.id)});
         //     if (room) {
         //         room.players = room.players.filter((item) => item !== player);
 
         //        this.rooms.push(room);
         //     }
         // });
-         }
+    }
 }

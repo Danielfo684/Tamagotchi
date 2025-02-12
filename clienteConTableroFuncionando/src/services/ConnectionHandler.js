@@ -8,15 +8,14 @@ export const ConnectionHandler = {
     controller: null,
     init: (url, controller, onConnectedCallBack, onDisconnectedCallBack) => {
         ConnectionHandler.controller = controller;
-        let { socket } = ConnectionHandler; 
+        let { socket } = ConnectionHandler;
         socket = io(url);
         socket.onAny((message, payload) => {
             console.log("Esta llegando: ");
             console.log(payload);
-            console.log(payload.type);
-            console.log(payload.content);
 
-          });
+
+        });
 
         socket.on("connect", (data) => {
             socket.on("connectionStatus", (data) => {
@@ -33,5 +32,17 @@ export const ConnectionHandler = {
                 onDisconnectedCallBack();
             });
         })
+        // no he encontrado la forma de enlazar limpiamente el socket emit con 
+        // la UI y mantenerlos separados, voy a llamar al socket emit directamente en UI
+        emitData: (message, payload) => {
+            if (ConnectionHandler.socket) {
+                ConnectionHandler.socket.emit(message, payload);
+            } else {
+                console.error("Socket is not initialized.");
+            }
+        }
     }
 }
+
+
+
