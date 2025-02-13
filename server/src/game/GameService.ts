@@ -31,9 +31,15 @@ export class GameService {
             visibility: true
         }
     }
+    public updatePlayer(data: any) {
+         console.log(data.id);
+         let room: Room = RoomService.getInstance().getRoomByPlayerId(data.id);
+        room = RoomService.getInstance().updatePlayer(room, data);
+        this.sendUpdatedPlayers(room, room.players);
 
+    }
     public addPlayer(player: Player): boolean {
-
+        console.log(player.id.id);
         const room: Room = RoomService.getInstance().addPlayer(player);
 
         ServerService.getInstance().sendMessage(room.name, Messages.ASIGN_MY_PLAYER, {
@@ -55,37 +61,20 @@ export class GameService {
             if (room.game) {
                 room.game.state = GameStates.PLAYING;
                 if (ServerService.getInstance().isActive()) {
-                  
+
 
                     // ServerService.getInstance().sendMessage(room.name, Messages.ASIGN_PLAYER, {
                     //     message: "id assigned to player",
                     //     player1: room.players[0].id.id,
-                        // player2: room.players[1].id.id,
-                        // player3: room.players[2].id.id,
-                        // player4: room.players[3].id.id
+                    // player2: room.players[1].id.id,
+                    // player3: room.players[2].id.id,
+                    // player4: room.players[3].id.id
 
                     // }
                     // );
-
-                    ServerService.getInstance().sendMessage(room.name, Messages.PLAYERS_UPDATE,[ {
-                        name: '1',
-                        player: this.mapPlayer(room.players[0]),
-
-                    }
-                        //     ,
-                        // {
-                        //     name: '2',
-                        //     player: this.mapPlayer(room.players[1])
-                        // }
-                        // ,
-                        // {
-                        //     name: '3',
-                        //     player: this.mapPlayer(room.players[2])
-                        // }
-                    ]);
-                    ServerService.getInstance().sendMessage(room.name, Messages.BOARD, room.game.board,
-
-                    );
+                    this.sendUpdatedPlayers(room, room.players);
+                
+                    ServerService.getInstance().sendMessage(room.name, Messages.BOARD, room.game.board);
                 }
             }
             return true;
@@ -93,6 +82,24 @@ export class GameService {
 
         return false;
     }
+
+    private sendUpdatedPlayers(room : Room, data: Player[]) {
+    ServerService.getInstance().sendMessage(room.name, Messages.PLAYERS_UPDATE, [{
+                        name: '1',
+                        player: this.mapPlayer(data[0]),
+                    },
+                    {
+                        name: '2',
+                        player: this.mapPlayer(data[1])
+                    }
+                        // ,
+                        // {
+                        //     name: '3',
+                        //     player: this.mapPlayer(room.players[2])
+                        // }
+                    ]);
+    }
+
     private mapPlayer(player: Player) {
         return {
             id: player.id.id,

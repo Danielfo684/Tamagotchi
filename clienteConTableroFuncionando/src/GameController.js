@@ -8,20 +8,25 @@ export class GameController {
     };
     #state = null;
     #gameService = null;
+    #ConnectionHandler = null;
 
     constructor(url, ui) {
         ui.initUI();
         this.#gameService = new GameService(ui);
         ConnectionHandler.init(url, this, () => {
             this.#state = this.#states.RIGHT;
-            ui.setConnectionHandler(ConnectionHandler.socket); 
         }, () => {
             this.#state = this.#states.BAD;
         });
+
     }
 
     actionController(payload) {
         if (this.#state === this.#states.RIGHT)
             this.#gameService.do(payload);
+    }
+    respondController(message, payload) {
+        console.log(ConnectionHandler);
+            ConnectionHandler.controller.socket.emit(message, payload);
     }
 }

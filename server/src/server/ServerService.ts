@@ -2,32 +2,17 @@ import { DefaultEventsMap, Server, Socket } from 'socket.io';
 import http from 'http';
 import { GameService } from '../game/GameService';
 import { AnyTxtRecord } from 'dns';
-import {RoomService } from '../room/RoomService';
+import { RoomService } from '../room/RoomService';
 export class ServerService {
     private io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any> | null;
-    private active : boolean;
+    private active: boolean;
     static messages = {
         out: {
             new_player: "NEW_PLAYER",
             room_status: "ROOM_STATUS",
             players_ready: "PLAYERS_READY"
-        } 
+        }
     }
-
-    public inputMessage = [
-            {
-                type: "ATTACK",
-                do: this.doAttack
-            },
-            {
-                type: "ROTATE",
-                do: this.doRotate
-            },
-            {
-                type: "MOVE",
-                do: this.doMove
-            }
-        ];
 
     private static instance: ServerService;
     private constructor() {
@@ -55,35 +40,42 @@ export class ServerService {
         this.io.on('connection', (socket) => {
             socket.emit("connectionStatus", { status: true });
             GameService.getInstance().addPlayer(GameService.getInstance().buildPlayer(socket));
-            
-            socket.on("message", (data)=>{
-                const doType = this.inputMessage.find(item => item.type == data.type);
-                if (doType !== undefined) {
-                    doType.do(data);
-                }
+            socket.on("UPDATE_PLAYER", (data) => {
+                GameService.getInstance().updatePlayer(data);
             })
 
             socket.on('disconnect', () => {
                 console.log('Un cliente se ha desconectado:', socket.id);
                 RoomService.getInstance().removePlayer(socket.id);
             });
-        
-        
-        
+
+
+
+
         });
     }
 
-    public addPlayerToRoom(player : Socket, room: String) {
+    public addPlayerToRoom(player: Socket, room: String) {
         player.join(room.toString());
     }
 
-    public sendMessage(room: String |null ,type: String, content: any) {
+    public sendMessage(room: String | null, type: String, content: any) {
         console.log(content);
-        if (this.active && this.io!=null) {
+        if (this.active && this.io != null) {
             if (room != null) {
-                    this.io?.to(room.toString()).emit("message", {
-                        type, content
-                    })
+                this.io?.to(room.toString()).emit("message", {
+                    type, content
+                })
+            }
+        }
+    }
+    public sendBroadcastMessage(room: String | null, type: String, content: any) {
+        console.log(content);
+        if (this.active && this.io != null) {
+            if (room != null) {
+                this.io?.to(room.toString()).emit("message", {
+                    type, content
+                })
             }
         }
     }
@@ -96,18 +88,8 @@ export class ServerService {
         return this.active;
     }
 
-    private doAttack(data: String) {
-        console.log("Attack");
-        console.log(data);
-    }
 
-    private doRotate(data: String) {
-        console.log("Rotate");
-        console.log(data);
-    }
-
-    private doMove(data: String) {
-        console.log("Move");
-        console.log(data);
-    }
 }
+
+
+//Fallo de concepto tengo que enviar a donde quiere moverse el jugador no la posicion del jugador

@@ -23,8 +23,9 @@ export class GameService {
         "PLAYERS_UPDATE" : this.do_updatePlayers.bind(this),
         "ASIGN_PLAYER" : this.do_asignPlayer.bind(this),
         "ASIGN_MY_PLAYER" : this.do_asignMyPlayer.bind(this),
-        "SEND_UPDATE" : this.do_sendMyPlayer.bind(this)
+        // "SEND_UPDATE" : this.do_sendMyPlayer.bind(this)
         // "ROOM_STATUS" : this.do_newBoard.bind(this)
+        "UPDATE_PLAYER" : this.do_updatePlayers.bind(this)
     };
 
     constructor(ui){
@@ -80,9 +81,8 @@ export class GameService {
 
 
     async do_updatePlayers (payload) {
-        console.log(this.#startingPositions);
         console.log(this.#players);
-
+        console.log(payload);
        if (this.#players.length === 0) {
          payload.forEach(item => {
             console.log("updating player " + item.name);
@@ -91,16 +91,27 @@ export class GameService {
       
          console.log(this.#players);
          this.#players.map((player, index) => {
+            console.log(index);
          player.x = this.#startingPositions[index][0];
+         console.log(this.#startingPositions[index][1]);
          player.y =  this.#startingPositions[index][1];
       });
-        } else {
-            // payload.forEach(item => {
-            //     const player = this.#players.find(player => player.id === item.player.id);
-            //     player.x = item.player.x;
-            //     player.y = item.player.y;
-            // });
-            // this.#ui.movePlayer(this.#players);
+      console.log(this.#myPlayer);
+
+      this.#myPlayer = this.#players.find(player =>
+         player.id === this.#myPlayer.player.id);
+    } else {
+            payload.forEach(item => {
+                console.log(item);
+                const player = this.#players.find(player => player.id === item.player.id);
+                player.x = item.player.x;
+                player.y = item.player.y;
+                player.status = item.player.status;
+                player.direction = item.player.direction;
+                player.visibility = item.player.visibility;
+                this.#ui.movePlayer(player);
+
+            });
         }
      
 
@@ -109,21 +120,29 @@ export class GameService {
     async do_newBoard(payload) {
         console.log(payload);
         this.#board.build(payload);
+        console.log(this.#players);
         this.#ui.drawBoard(this.#board.map, this.#players);
-        this.#ui.playerButtons(this.#myPlayer);
+        
+        console.log (this.#myPlayer);
 
+        this.#ui.playerButtons(this.#myPlayer, ConnectionHandler.controller);
+        // le mandamos por parámetro el connectionHandler.controller.función de envio de mensajes al servidor y en UIv1.js se lo pasamos a los botones
 
     }
 
     async do_asignMyPlayer(payload) {
-       this.#myPlayer = payload;
-       console.log(this.#myPlayer);
+        if (this.#myPlayer === null) {
+            this.#myPlayer = payload;
+            console.log("my player");
+            console.log(this.#myPlayer);
+        }
+    
     }
 
-    async do_sendMyPlayer(payload) {
-        ConnectionHandler.emitData("SEND_UPDATE", {
-            player: this.#myPlayer
-        });
-    }
+    // async do_sendMyPlayer(payload) {
+    //     ConnectionHandler.emitData("SEND_UPDATE", {
+    //         player: this.#myPlayer
+    //     });
+    // }
     
 }

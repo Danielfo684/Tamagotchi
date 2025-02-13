@@ -8,26 +8,25 @@ export const ConnectionHandler = {
     controller: null,
     init: (url, controller, onConnectedCallBack, onDisconnectedCallBack) => {
         ConnectionHandler.controller = controller;
-        let { socket } = ConnectionHandler;
-        socket = io(url);
-        socket.onAny((message, payload) => {
+        ConnectionHandler.socket = io(url);
+        ConnectionHandler.socket.onAny((message, payload) => {
             console.log("Esta llegando: ");
             console.log(payload);
 
 
         });
-
-        socket.on("connect", (data) => {
-            socket.on("connectionStatus", (data) => {
+        
+        ConnectionHandler.socket.on("connect", (data) => {
+            ConnectionHandler.socket.on("connectionStatus", (data) => {
                 ConnectionHandler.connected = true;
                 console.log(data);
                 onConnectedCallBack();
             });
-            socket.on("message", (payload) => {
+            ConnectionHandler.socket.on("message", (payload) => {
                 ConnectionHandler.controller.actionController(payload);
                 //socket.emit("message",{ type: "HELLO", content: "Hello world!"});
             })
-            socket.on("disconnect", () => {
+            ConnectionHandler.socket.on("disconnect", () => {
                 ConnectionHandler.connected = false;
                 onDisconnectedCallBack();
             });
@@ -35,6 +34,9 @@ export const ConnectionHandler = {
         // no he encontrado la forma de enlazar limpiamente el socket emit con 
         // la UI y mantenerlos separados, voy a llamar al socket emit directamente en UI
         
+    },
+    enviarCosas : (payload) => {
+        ConnectionHandler.socket.emit("UPDATE_PLAYER", payload);
     }
 }
 
