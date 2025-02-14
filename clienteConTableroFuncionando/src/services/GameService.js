@@ -3,9 +3,9 @@ import { Queue } from "../Queue.js";
 import { ConnectionHandler } from "./ConnectionHandler.js";
 export class GameService {
     #states = {
-        WAITING : 0,
-        PLAYING : 1,
-        ENDED : 2
+        WAITING: 0,
+        PLAYING: 1,
+        ENDED: 2
     };
     #ui = null;
     #players = [];
@@ -18,17 +18,17 @@ export class GameService {
 
 
     #actionsList = {
-        "NEW_PLAYER" : this.do_newPlayer.bind(this),
-        "BOARD" : this.do_newBoard.bind(this),
-        "PLAYERS_UPDATE" : this.do_updatePlayers.bind(this),
-        "ASIGN_PLAYER" : this.do_asignPlayer.bind(this),
-        "ASIGN_MY_PLAYER" : this.do_asignMyPlayer.bind(this),
+        "NEW_PLAYER": this.do_newPlayer.bind(this),
+        "BOARD": this.do_newBoard.bind(this),
+        "PLAYERS_UPDATE": this.do_updatePlayers.bind(this),
+        "ASIGN_PLAYER": this.do_asignPlayer.bind(this),
+        "ASIGN_MY_PLAYER": this.do_asignMyPlayer.bind(this),
         // "SEND_UPDATE" : this.do_sendMyPlayer.bind(this)
         // "ROOM_STATUS" : this.do_newBoard.bind(this)
-        "UPDATE_PLAYER" : this.do_updatePlayers.bind(this)
+        "UPDATE_PLAYER": this.do_updatePlayers.bind(this)
     };
 
-    constructor(ui){
+    constructor(ui) {
         this.#state = this.#states.WAITING;
         this.#board = new Board();
         this.#queue = new Queue();
@@ -36,17 +36,17 @@ export class GameService {
         this.checkScheduler();
         this.#ui = ui;
         console.log(this.#board);
-        this.#startingPositions = [[0,0], [0,9], [9,0], [9,9]];
+        this.#startingPositions = [[0, 0], [0, 9], [9, 0], [9, 9]];
     }
 
     checkScheduler() {
         if (!this.#queue.isEmpty()) {
             if (this.#parallel == null) {
                 this.#parallel = setInterval(
-                    async ()=>{
+                    async () => {
                         const action = this.#queue.getMessage();
                         if (action != undefined) {
-                            await this.#actionsList[action.type] (action.content);
+                            await this.#actionsList[action.type](action.content);
                         } else {
                             this.stopScheduler();
                         }
@@ -61,12 +61,12 @@ export class GameService {
         this.#parallel = null;
     }
 
-    do (data) {
+    do(data) {
         this.#queue.addMessage(data);
         this.checkScheduler();
     };
 
-    async do_newPlayer (payload) {
+    async do_newPlayer(payload) {
         console.log('new player');
 
         console.log(payload);
@@ -74,47 +74,44 @@ export class GameService {
         console.log(this.#players);
 
     };
-    
-    async do_asignPlayer (payload) {
+
+    async do_asignPlayer(payload) {
         console.log(payload);
     };
 
 
-    async do_updatePlayers (payload) {
+    async do_updatePlayers(payload) {
         console.log(this.#players);
         console.log(payload);
-       if (this.#players.length === 0) {
-         payload.forEach(item => {
-            console.log("updating player " + item.name);
-             this.#players.push(item.player);
-         });
-      
-         console.log(this.#players);
-         this.#players.map((player, index) => {
-            console.log(index);
-         player.x = this.#startingPositions[index][0];
-         console.log(this.#startingPositions[index][1]);
-         player.y =  this.#startingPositions[index][1];
-      });
-      console.log(this.#myPlayer);
-
-      this.#myPlayer = this.#players.find(player =>
-         player.id === this.#myPlayer.player.id);
-    } else {
+        if (this.#players.length === 0) {
             payload.forEach(item => {
-                console.log(item);
-                const player = this.#players.find(player => player.id === item.player.id);
-                player.x = item.player.x;
-                player.y = item.player.y;
-                player.status = item.player.status;
-                player.direction = item.player.direction;
-                player.visibility = item.player.visibility;
-                this.#ui.movePlayer(player);
-
+                console.log("updating player " + item.name);
+                this.#players.push(item.player);
             });
-        }
-     
 
+            console.log(this.#players);
+            this.#players.map((player, index) => {
+                console.log(index);
+                player.x = this.#startingPositions[index][0];
+                console.log(this.#startingPositions[index][1]);
+                player.y = this.#startingPositions[index][1];
+            });
+            console.log(this.#myPlayer);
+
+            this.#myPlayer = this.#players.find(player =>
+                player.id === this.#myPlayer.player.id);
+        } else {
+            console.log(payload);
+            const player = this.#players.find(player => player.id === payload.player.id);
+            player.x = payload.player.x;
+            player.y = payload.player.y;
+            player.status = payload.player.status;
+            player.direction = payload.player.direction;
+            player.visibility = payload.player.visibility;
+
+            this.#ui.do_action(player, payload.message);
+
+        };
     };
 
     async do_newBoard(payload) {
@@ -122,8 +119,8 @@ export class GameService {
         this.#board.build(payload);
         console.log(this.#players);
         this.#ui.drawBoard(this.#board.map, this.#players);
-        
-        console.log (this.#myPlayer);
+
+        console.log(this.#myPlayer);
 
         this.#ui.playerButtons(this.#myPlayer, ConnectionHandler.controller);
         // le mandamos por parámetro el connectionHandler.controller.función de envio de mensajes al servidor y en UIv1.js se lo pasamos a los botones
@@ -136,7 +133,7 @@ export class GameService {
             console.log("my player");
             console.log(this.#myPlayer);
         }
-    
+
     }
 
     // async do_sendMyPlayer(payload) {
@@ -144,5 +141,5 @@ export class GameService {
     //         player: this.#myPlayer
     //     });
     // }
-    
+
 }

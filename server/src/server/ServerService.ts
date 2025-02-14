@@ -41,6 +41,7 @@ export class ServerService {
             socket.emit("connectionStatus", { status: true });
             GameService.getInstance().addPlayer(GameService.getInstance().buildPlayer(socket));
             socket.on("UPDATE_PLAYER", (data) => {
+                console.log(data);
                 GameService.getInstance().updatePlayer(data);
             })
 
@@ -60,16 +61,6 @@ export class ServerService {
     }
 
     public sendMessage(room: String | null, type: String, content: any) {
-        console.log(content);
-        if (this.active && this.io != null) {
-            if (room != null) {
-                this.io?.to(room.toString()).emit("message", {
-                    type, content
-                })
-            }
-        }
-    }
-    public sendBroadcastMessage(room: String | null, type: String, content: any) {
         console.log(content);
         if (this.active && this.io != null) {
             if (room != null) {

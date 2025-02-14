@@ -32,10 +32,10 @@ export class GameService {
         }
     }
     public updatePlayer(data: any) {
-         console.log(data.id);
-         let room: Room = RoomService.getInstance().getRoomByPlayerId(data.id);
+        console.log(data.action);
+        let room: Room = RoomService.getInstance().getRoomByPlayerId(data.player.id);
         room = RoomService.getInstance().updatePlayer(room, data);
-        this.sendUpdatedPlayers(room, room.players);
+        this.sendUpdatedPlayers(room, data.player, data.action);
 
     }
     public addPlayer(player: Player): boolean {
@@ -72,8 +72,8 @@ export class GameService {
 
                     // }
                     // );
-                    this.sendUpdatedPlayers(room, room.players);
-                
+                    this.sendStartingPlayers(room, room.players);
+
                     ServerService.getInstance().sendMessage(room.name, Messages.BOARD, room.game.board);
                 }
             }
@@ -83,23 +83,30 @@ export class GameService {
         return false;
     }
 
-    private sendUpdatedPlayers(room : Room, data: Player[]) {
-    ServerService.getInstance().sendMessage(room.name, Messages.PLAYERS_UPDATE, [{
-                        name: '1',
-                        player: this.mapPlayer(data[0]),
-                    },
-                    {
-                        name: '2',
-                        player: this.mapPlayer(data[1])
-                    }
-                        // ,
-                        // {
-                        //     name: '3',
-                        //     player: this.mapPlayer(room.players[2])
-                        // }
-                    ]);
+    private sendStartingPlayers(room: Room, data: Player[]) {
+        ServerService.getInstance().sendMessage(room.name, Messages.PLAYERS_UPDATE, [{
+            name: '1',
+            player: this.mapPlayer(data[0]),
+        },
+        {
+            name: '2',
+            player: this.mapPlayer(data[1])
+        }
+            // ,
+            // {
+            //     name: '3',
+            //     player: this.mapPlayer(room.players[2])
+            // }
+        ]);
     }
 
+    private sendUpdatedPlayers(room: Room, data: Player, message?: string) {
+        ServerService.getInstance().sendMessage(room.name, Messages.PLAYERS_UPDATE, {
+            message: message,
+            player: data,
+        }
+        );
+    }
     private mapPlayer(player: Player) {
         return {
             id: player.id.id,

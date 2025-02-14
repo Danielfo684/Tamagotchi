@@ -56,6 +56,7 @@ export class RoomService {
         // });
     }
     public getRoomByPlayerId(playerId: String): Room {
+        console.log(playerId);
          const room = this.rooms.find((room) => room.players.find((player) => player.id.id === playerId));
          if (!room) {
             throw new Error('Room not found for playerId');

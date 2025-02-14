@@ -8,7 +8,11 @@ UIv1.initUI = () => {
     base.classList.add("board");
 }
 
-
+UIv1.actionsList = {
+    "MOVING": (player) => UIv1.do_move(player),
+    "ATTACKING": (player) => UIv1.do_attack(player),
+    "ROTATING": (player) => UIv1.do_rotate(player)
+};
 
 
 UIv1.drawBoard = (board, players) => {
@@ -54,21 +58,7 @@ UIv1.drawBoard = (board, players) => {
 
     }
 
-    UIv1.movePlayer = (player) => {
-        console.log("Moving player");
-        console.log(player);
-        let playerTile = document.querySelector(`[data-element="${player.id}"]`);
-        playerTile.innerHTML = '';
-        playerTile.dataset.element = '';
-        playerTile.dataset.ocuppied = false;
-        playerTile = board[player.x][player.y];
-        const playerImage = document.createElement('img');
-        playerImage.src = `assets/images/player.png`;
-        playerImage.style.transform = UIv1.setImageRotation(player.direction);
-        playerTile.dataset.element = player.id;
-        playerTile.dataset.ocuppied = true;
-        playerTile.appendChild(playerImage);
-    }
+
 
     UIv1.playerButtons = (player, connect) => {
         console.log('my player' + player.id);
@@ -79,50 +69,29 @@ UIv1.drawBoard = (board, players) => {
         swordIcon.src = 'assets/images/sword.png';
         attackButton.appendChild(swordIcon);
 
-        attackButton.addEventListener('click', () => {
-            let playerTile = document.querySelector(`[data-element="${player.id}"]`);
-
-            console.log('Attack button clicked');
-            let x = player.x;
-            let y = player.y;
-            switch (player.direction) {
-                case Directions.Up:
-                    --x;
-                case Directions.Right:
-                    ++y;
-                    break;
-                case Directions.Down:
-                    ++x;
-                    break;
-                case Directions.Left:
-                    --y;
-                    break;
-            }
-            anime({
-                targets: playerTile.querySelector('img'),
-                translateX: [0, 50],
-                duration: 300,
-                easing: 'easeInOutQuad'
-            });
-            anime({
-                targets: playerTile.querySelector('img'),
-                translateX: [50, 0],
-                duration: 300,
-                easing: 'easeInOutQuad'
-            });
-
-            player.status = 'attacking';
-            setTimeout(() => {
-                player.status = 'idle';
-            }, 100);
-            ConnectionHandler.enviarCosas(player);   
-        });
-
         const advanceButton = document.createElement('button');
         const moveIcon = document.createElement('img');
         moveIcon.src = 'assets/images/movement.png';
         advanceButton.appendChild(moveIcon);
 
+        const rotateButton = document.createElement('button');
+        const rotateIcon = document.createElement('img');
+        rotateIcon.src = 'assets/images/rotate-right.png';
+        rotateButton.appendChild(rotateIcon);
+
+
+        const buttonContainer = document.createElement('div');
+        buttonContainer.classList.add('button-container');
+        buttonContainer.appendChild(attackButton);
+        buttonContainer.appendChild(advanceButton);
+        buttonContainer.appendChild(rotateButton);
+
+        document.body.appendChild(buttonContainer);
+
+        attackButton.addEventListener('click', () => {
+            console.log('Attack button clicked');
+            ConnectionHandler.enviarCosas(UIv1.mapPlayer(player, 'ATTACKING'));
+        });
         advanceButton.addEventListener('click', () => {
             console.log('Movement button clicked');
             let x = player.x;
@@ -150,77 +119,162 @@ UIv1.drawBoard = (board, players) => {
             // if (board[x][y].dataset.ocuppied === 'true') {
             //     console.log('Tile is occupied');
             // } else {
-                player.x = x;
-                player.y = y;
-                UIv1.movePlayer(player);
+            player.x = x;
+            player.y = y;
             // }
-ConnectionHandler.enviarCosas(player);        });
-
-        const rotateButton = document.createElement('button');
-        const rotateIcon = document.createElement('img');
-        rotateIcon.src = 'assets/images/rotate-right.png';
-        rotateButton.appendChild(rotateIcon);
-        rotateButton.addEventListener('click', () => {
-            console.log(player.x);
-            console.log(player.y);
-            console.log('Rotate button clicked');
-            let playerTile = document.querySelector(`[data-element="${player.id}"]`);
-            console.log(playerTile);
-            switch (player.direction) {
-                case Directions.Up:
-                    player.direction = Directions.Right;
-                    playerTile.querySelector('img').style.transform = `rotate(0deg)`;
-                    break;
-                case Directions.Right:
-                    player.direction = Directions.Down;
-                    playerTile.querySelector('img').style.transform = `rotate(90deg)`;
-                    break;
-                case Directions.Down:
-                    player.direction = Directions.Left;
-                    playerTile.querySelector('img').style.transform = `rotate(180deg)`;
-                    break;
-                case Directions.Left:
-                    player.direction = Directions.Up;
-                    playerTile.querySelector('img').style.transform = `rotate(270deg)`;
-                    break;
-            }
-            console.log(`Player direction: ${player.direction}`);
-            ConnectionHandler.enviarCosas(player);   
-
+            ConnectionHandler.enviarCosas(UIv1.mapPlayer(player, "MOVING", x, y));
         });
 
-        const buttonContainer = document.createElement('div');
-        buttonContainer.classList.add('button-container');
-        buttonContainer.appendChild(attackButton);
-        buttonContainer.appendChild(advanceButton);
-        buttonContainer.appendChild(rotateButton);
 
-        document.body.appendChild(buttonContainer);
+        rotateButton.addEventListener('click', () => {
+            console.log('Rotate button clicked');
+
+            ConnectionHandler.enviarCosas(UIv1.mapPlayer(player, "ROTATING"));
+
+
+        });
+        // )
+        ;
+
+
+    }
+    UIv1.do_rotate = (player) => {
+        let playerImage = document.querySelector(`[data-element="${player.id}"] img`);
+        playerImage.style.transform = UIv1.setImageRotation(player, playerImage);
+
+        console.log(`Player direction: ${player.direction}`);
     }
 
-    UIv1.setImageRotation = (direction) => {
-        switch (direction) {
+    UIv1.do_attack = (player) => {
+        let playerTile = document.querySelector(`[data-element="${player.id}"]`);
+        let x = player.x;
+        let y = player.y;
+        switch (player.direction) {
             case Directions.Up:
-                return `rotate(270deg)`;
+                --x;
             case Directions.Right:
-                return `rotate(0deg)`;
+                ++y;
+                break;
             case Directions.Down:
-                return `rotate(90deg)`;
+                ++x;
+                break;
             case Directions.Left:
-                return `rotate(180deg)`;
+                --y;
+                break;
+        }
+        anime({
+            targets: playerTile.querySelector('img'),
+            translateX: [0, 50],
+            duration: 300,
+            easing: 'easeInOutQuad'
+        });
+        anime({
+            targets: playerTile.querySelector('img'),
+            translateX: [50, 0],
+            duration: 300,
+            easing: 'easeInOutQuad'
+        });
+
+        player.status = 'ATTACKING';
+        setTimeout(() => {
+            player.status = 'idle';
+            UIv1.updatePlayerStatus(player);
+        }, 100);
+    }
+    UIv1.do_action = (player, message) => {
+        UIv1.actionsList[message](player);
+    }
+
+    UIv1.updatePlayerStatus = (player) => {
+        let playerTile = document.querySelector(`[data-element="${player.id}"]`);
+        if (playerTile) {
+            playerTile.dataset.status = player.status;
+        }
+    }
+
+
+
+    UIv1.do_move = (player) => {
+        console.log("Moving player");
+        console.log(player);
+        let playerTile = document.querySelector(`[data-element="${player.id}"]`);
+        playerTile.innerHTML = '';
+        playerTile.dataset.element = '';
+        playerTile.dataset.ocuppied = false;
+        playerTile = board[player.x][player.y];
+        const playerImage = document.createElement('img');
+        playerImage.src = `assets/images/player.png`;
+
+        playerTile.dataset.element = player.id;
+        playerTile.dataset.ocuppied = true;
+        playerTile.appendChild(playerImage);
+        UIv1.setImageRotation(player);
+
+
+    }
+
+    UIv1.setImageRotation = (player) => {
+        console.log('Setting image rotation');
+        console.log(player.direction);
+        let playerTile = document.querySelector(`[data-element="${player.id}"]`);
+        console.log(playerTile);
+        switch (player.direction) {
+            case Directions.Up:
+                playerTile.querySelector('img').style.transform = `rotate(270deg)`;
+                break;
+            case Directions.Right:
+                playerTile.querySelector('img').style.transform = `rotate(0deg)`;
+                break;
+            case Directions.Down:
+                playerTile.querySelector('img').style.transform = `rotate(90deg)`;
+                break;
+            case Directions.Left:
+                playerTile.querySelector('img').style.transform = `rotate(180deg)`;
+                break;
         }
 
 
     }
 
-    UIv1.mapPlayer = (player) => {
+    UIv1.mapPlayer = (player, message, x, y) => {
+        let playerTile = document.querySelector(`[data-element="${player.id}"]`);
+        let payload = player;
+
+
+        if (message === 'ATTACKING') {
+            payload.state = 'ATTACKING';
+        }
+        if (message === 'MOVING') {
+            payload.x = x;
+            payload.y = y;
+        }
+        if (message === 'ROTATING') {
+            switch (player.direction) {
+                case Directions.Up:
+                    payload.direction = Directions.Right;
+                    break;
+                case Directions.Right:
+                    payload.direction = Directions.Down;
+                    break;
+                case Directions.Down:
+                    payload.direction = Directions.Left;
+                    break;
+                case Directions.Left:
+                    payload.direction = Directions.Up;
+                    break;
+            }
+        }
+        console.log(payload);
         return {
-            id: player.id.id,
-            x: player.x,
-            y: player.y,
-            state: player.state,
-            direction: player.direction,
-            visibility: player.visibility
+            action: message,
+            player: {
+                id: payload.id,
+                x: payload.x,
+                y: payload.y,
+                state: payload.state,
+                direction: payload.direction,
+                visibility: payload.visibility
+            }
         }
     }
 }
