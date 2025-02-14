@@ -25,7 +25,10 @@ export class GameService {
         "ASIGN_MY_PLAYER": this.do_asignMyPlayer.bind(this),
         // "SEND_UPDATE" : this.do_sendMyPlayer.bind(this)
         // "ROOM_STATUS" : this.do_newBoard.bind(this)
-        "UPDATE_PLAYER": this.do_updatePlayers.bind(this)
+        "UPDATE_PLAYER": this.do_updatePlayers.bind(this),
+        "ATTACKING": this.do_attack.bind(this),
+        "MOVING": this.do_move.bind(this),
+        "ROTATING": this.do_rotate.bind(this)
     };
 
     constructor(ui) {
@@ -35,7 +38,6 @@ export class GameService {
         this.#parallel = null;
         this.checkScheduler();
         this.#ui = ui;
-        console.log(this.#board);
         this.#startingPositions = [[0, 0], [0, 9], [9, 0], [9, 9]];
     }
 
@@ -67,60 +69,49 @@ export class GameService {
     };
 
     async do_newPlayer(payload) {
-        console.log('new player');
 
-        console.log(payload);
         this.#players.push(payload);
-        console.log(this.#players);
 
     };
 
     async do_asignPlayer(payload) {
-        console.log(payload);
     };
 
 
     async do_updatePlayers(payload) {
-        console.log(this.#players);
-        console.log(payload);
         if (this.#players.length === 0) {
             payload.forEach(item => {
-                console.log("updating player " + item.name);
                 this.#players.push(item.player);
             });
 
-            console.log(this.#players);
             this.#players.map((player, index) => {
-                console.log(index);
                 player.x = this.#startingPositions[index][0];
-                console.log(this.#startingPositions[index][1]);
                 player.y = this.#startingPositions[index][1];
             });
-            console.log(this.#myPlayer);
 
             this.#myPlayer = this.#players.find(player =>
                 player.id === this.#myPlayer.player.id);
         } else {
-            console.log(payload);
             const player = this.#players.find(player => player.id === payload.player.id);
             player.x = payload.player.x;
             player.y = payload.player.y;
             player.status = payload.player.status;
             player.direction = payload.player.direction;
             player.visibility = payload.player.visibility;
-
-            this.#ui.do_action(player, payload.message);
+            let newPayload = {
+                type : payload.message ,
+                content: payload.player
+            }
+            this.do(newPayload);
+            this.#ui.do_action(player, payload.message, this.#myPlayer);
 
         };
     };
 
     async do_newBoard(payload) {
-        console.log(payload);
         this.#board.build(payload);
-        console.log(this.#players);
         this.#ui.drawBoard(this.#board.map, this.#players);
 
-        console.log(this.#myPlayer);
 
         this.#ui.playerButtons(this.#myPlayer, ConnectionHandler.controller);
         // le mandamos por parámetro el connectionHandler.controller.función de envio de mensajes al servidor y en UIv1.js se lo pasamos a los botones
@@ -130,11 +121,13 @@ export class GameService {
     async do_asignMyPlayer(payload) {
         if (this.#myPlayer === null) {
             this.#myPlayer = payload;
-            console.log("my player");
-            console.log(this.#myPlayer);
+           
         }
 
     }
+    async do_attack(payload) {}
+    async do_move(payload) {}
+    async do_rotate(payload) {}
 
     // async do_sendMyPlayer(payload) {
     //     ConnectionHandler.emitData("SEND_UPDATE", {

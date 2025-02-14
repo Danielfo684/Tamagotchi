@@ -10,8 +10,7 @@ export const ConnectionHandler = {
         ConnectionHandler.controller = controller;
         ConnectionHandler.socket = io(url);
         ConnectionHandler.socket.onAny((message, payload) => {
-            console.log("Esta llegando: ");
-            console.log(payload);
+          
 
 
         });
@@ -19,7 +18,6 @@ export const ConnectionHandler = {
         ConnectionHandler.socket.on("connect", (data) => {
             ConnectionHandler.socket.on("connectionStatus", (data) => {
                 ConnectionHandler.connected = true;
-                console.log(data);
                 onConnectedCallBack();
             });
             ConnectionHandler.socket.on("message", (payload) => {
