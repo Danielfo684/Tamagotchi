@@ -11,7 +11,8 @@ UIv1.initUI = () => {
 UIv1.actionsList = {
     "MOVING": (player) => UIv1.do_move(player),
     "ATTACKING": (player) => UIv1.do_attack(player),
-    "ROTATING": (player) => UIv1.do_rotate(player)
+    "ROTATING": (player) => UIv1.do_rotate(player),
+    "DEFEATING": (player) => UIv1.do_defeatPlayer(player),
 };
 UIv1.elementEffects = {
     "bush": (player) => {
@@ -22,18 +23,19 @@ UIv1.elementEffects = {
     }
 }
 
+UIv1.myPlayer = null;
 
-UIv1.drawBoard = (board, players) => {
+UIv1.drawBoard = (board, players, myPlayer) => {
 
-
+    UIv1.myPlayer = myPlayer;
     if (board !== undefined) {
 
         const base = document.getElementById(UIv1.uiElements.board);
         base.innerHTML = '';
-        base.style.gridTemplateColumns = `repeat(${board.length}, 20px)`;
-        base.style.gridTemplateRows = `repeat(${board.length}, 20px)`;
+        base.style.gridTemplateColumns = `repeat(${board.length}, 50px)`;
+        base.style.gridTemplateRows = `repeat(${board.length}, 50px)`;
 
-
+console.log(board);
         board = board.map(column => column.map((row) => {
             const tile = document.createElement("div");
             tile.classList.add("tile");
@@ -47,13 +49,13 @@ UIv1.drawBoard = (board, players) => {
             anime({
                 targets: tile,
                 opacity: [0, 1],
-                duration: (Math.random() * 8000) + 1000,
+                duration: (Math.random() * 1000) + 1000,
                 easing: 'easeInOutQuad'
             });
             return tile;
         }));
 
-    
+
         players.forEach(player => {
             const playerTile = board[player.x][player.y];
             const playerImage = document.createElement('img');
@@ -62,6 +64,9 @@ UIv1.drawBoard = (board, players) => {
             playerTile.appendChild(playerImage);
             playerTile.dataset.player = player.id;
             playerTile.dataset.ocuppied = true;
+            if (player.id === UIv1.myPlayer.id) {
+                playerTile.style.backgroundColor = '#d2d7df';
+            }
         })
 
 
@@ -97,16 +102,14 @@ UIv1.drawBoard = (board, players) => {
 
         document.body.appendChild(buttonContainer);
 
-        attackButton.addEventListener('click', () => {
-            advanceButton.disabled = true;
-            setTimeout(() => {
-                advanceButton.disabled = false;
-            }, 100);
-            ConnectionHandler.enviarCosas(UIv1.mapPlayer(player, 'ATTACKING'));
-        });
+
         advanceButton.addEventListener('click', () => {
+            attackButton.disabled = true;
+            rotateButton.disabled = true;
             advanceButton.disabled = true;
             setTimeout(() => {
+                attackButton.disabled = false;
+                rotateButton.disabled = false;
                 advanceButton.disabled = false;
             }, 100);
             let x = player.x;
@@ -121,12 +124,12 @@ UIv1.drawBoard = (board, players) => {
                         ++y;
                     break;
                 case Directions.Down:
-                    if (x < 9)
+                    if (x <= 8)
 
                         ++x;
                     break;
                 case Directions.Left:
-                    if (x >= 0)
+                    if (y > 0)
 
                         --y;
                     break;
@@ -142,8 +145,12 @@ UIv1.drawBoard = (board, players) => {
 
 
         rotateButton.addEventListener('click', () => {
+            attackButton.disabled = true;
+            rotateButton.disabled = true;
             advanceButton.disabled = true;
             setTimeout(() => {
+                attackButton.disabled = false;
+                rotateButton.disabled = false;
                 advanceButton.disabled = false;
             }, 100);
 
@@ -154,7 +161,20 @@ UIv1.drawBoard = (board, players) => {
         // )
         ;
 
-
+        attackButton.addEventListener('click', () => {
+            attackButton.disabled = true;
+            rotateButton.disabled = true;
+            advanceButton.disabled = true;
+            setTimeout(() => {
+                attackButton.disabled = false;
+                rotateButton.disabled = false;
+                advanceButton.disabled = false;
+            }, 200);
+            let playerTile = document.querySelector(`[data-player="${player.id}"]`);
+            if (playerTile.dataset.element !== 'bush') {
+                ConnectionHandler.enviarCosas(UIv1.mapPlayer(player, 'ATTACKING'));
+            }
+        });
     }
     UIv1.do_rotate = (player) => {
         let playerImage = document.querySelector(`[data-player="${player.id}"] img`);
@@ -162,6 +182,7 @@ UIv1.drawBoard = (board, players) => {
     }
 
     UIv1.do_attack = (player) => {
+        console.log('do_attack');
         let playerTile = document.querySelector(`[data-player="${player.id}"]`);
         let x = player.x;
         let y = player.y;
@@ -190,8 +211,15 @@ UIv1.drawBoard = (board, players) => {
             duration: 300,
             easing: 'easeInOutQuad'
         });
-        if (UIv1.checkAdjacentPlayer(player, board)) {
-            //    GameService.defeatPlayer(board[x][y].dataset.player);
+        if (!UIv1.checkAdjacentTile(player, board)) {
+            console.log('Tile is occupied');
+            let defeatedPlayer = board[x][y].dataset.player;
+            console.log(x, y);
+            console.log("llamada a defeating");
+            console.log(defeatedPlayer);
+            console.log(myPlayer);
+            if (defeatedPlayer === myPlayer.id)
+                ConnectionHandler.enviarCosas(UIv1.mapPlayer({ id: defeatedPlayer }, "DEFEATING"));
         };
 
     }
@@ -199,50 +227,86 @@ UIv1.drawBoard = (board, players) => {
         UIv1.actionsList[message](player);
     }
 
-    UIv1.updatePlayerStatus = (player) => {
+    UIv1.do_defeatPlayer = (player) => {
+        console.log(player.id);
+        console.log(UIv1.myPlayer.id);
+
         let playerTile = document.querySelector(`[data-player="${player.id}"]`);
+
         if (playerTile) {
-            playerTile.dataset.status = player.status;
+            playerTile.dataset.state = player.state;
         }
+        if (player.state === 'DEFEATED') {
+
+            playerTile.dataset.ocuppied = true;
+            playerTile.innerHTML = '';
+
+        }
+        if (player.id === UIv1.myPlayer.id) {
+            alert('You have been defeated');
+            document.querySelectorAll('button').forEach(button => {
+                button.disabled = true;
+            });
+        }
+        console.log("player defeated");
+
+        let playerImage = document.createElement('img');
+        playerImage.src = `assets/images/dead.png`;
+        playerImage.style.position = 'absolute';
+        playerImage.style.width = '50px';
+        playerImage.style.height = '50px';
+        playerTile.appendChild(playerImage);
+
+        playerTile.dataset.player = '';
+
     }
+
     UIv1.checkElement = (player, board) => {
         let playerTile = document.querySelector(`[data-player="${player.id}"]`);
         UIv1.elementEffects[playerTile.dataset.element](player);
     }
-    UIv1.checkAdjacentPlayer = (player, board) => {
+
+    UIv1.checkAdjacentTile = (player, board) => {
         let playerTile = document.querySelector(`[data-player="${player.id}"]`);
         switch (player.direction) {
             case Directions.Up:
                 if (player.x > 0) {
-                    if (board[player.x][player.y].dataset.ocuppied === 'true') {
+                    if (board[player.x - 1][player.y].dataset.ocuppied === 'true') {
                         return false;
                     }
                 }
                 break;
             case Directions.Right:
                 if (player.y < 9) {
-                    if (board[player.x][player.y].dataset.ocuppied === 'true') {
+                    if (board[player.x][player.y + 1].dataset.ocuppied === 'true') {
                         return false;
                     }
                 }
                 break;
             case Directions.Down:
                 if (player.x < 9) {
-                    if (board[player.x][player.y].dataset.ocuppied === 'true') {
+                    if (board[player.x + 1][player.y].dataset.ocuppied === 'true') {
                         return false;
                     }
                 }
                 break;
             case Directions.Left:
                 if (player.y > 0) {
-                    if (board[player.x][player.y].dataset.ocuppied === 'true') {
+                    if (board[player.x][player.y - 1].dataset.ocuppied === 'true') {
                         return false;
                     }
                 }
                 break;
         }
         return true;
+    }
+    UIv1.checkAdjacentPlayer = (player, board) => {
+        if (board[player.x][player.y].dataset.ocuppied === 'true') {
+            console.log('Tile is occupied');
 
+            return false;
+        }
+        return true;
     }
 
     UIv1.do_move = (player) => {
@@ -250,18 +314,30 @@ UIv1.drawBoard = (board, players) => {
         if (UIv1.checkAdjacentPlayer(player, board)) {
             playerTile.innerHTML = '';
             playerTile.dataset.player = '';
+            if (playerTile.dataset.element === 'bush') {
+                playerTile.style.backgroundColor = 'green';
+            }
+            else {
+                playerTile.style.backgroundColor = 'white';
+            }
             playerTile.dataset.ocuppied = false;
             playerTile = board[player.x][player.y];
             const playerImage = document.createElement('img');
             playerImage.src = `assets/images/player.png`;
-
+            if (player.id === UIv1.myPlayer.id) {
+                playerTile.style.backgroundColor = '#d2d7df';
+            }
             playerTile.dataset.player = player.id;
             playerTile.dataset.ocuppied = true;
             playerTile.appendChild(playerImage);
             UIv1.setImageRotation(player);
             UIv1.checkElement(player, board);
             if (player.visibility === false) {
-                playerTile.querySelector('img').style.opacity = 0.2;
+                playerTile.querySelector('img').style.opacity = 0;
+                if (player.id === UIv1.myPlayer.id) {
+                    playerTile.querySelector('img').style.opacity = 0.2;
+
+                }
             } else {
                 playerTile.querySelector('img').style.opacity = 1;
             }
@@ -308,9 +384,12 @@ UIv1.drawBoard = (board, players) => {
     }
 
     UIv1.mapPlayer = (player, message, x, y) => {
-        let playerTile = document.querySelector(`[data-player="${player.id}"]`);
-        let payload = player;
+        let payload = { ...player };
+        if (message === 'DEFEATING') {
 
+
+            payload.state = 'DEFEATED';
+        }
 
         if (message === 'ATTACKING') {
             payload.state = 'ATTACKING';

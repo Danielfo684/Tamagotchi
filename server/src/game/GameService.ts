@@ -63,15 +63,7 @@ export class GameService {
                 if (ServerService.getInstance().isActive()) {
 
 
-                    // ServerService.getInstance().sendMessage(room.name, Messages.ASIGN_PLAYER, {
-                    //     message: "id assigned to player",
-                    //     player1: room.players[0].id.id,
-                    // player2: room.players[1].id.id,
-                    // player3: room.players[2].id.id,
-                    // player4: room.players[3].id.id
 
-                    // }
-                    // );
                     this.sendStartingPlayers(room, room.players);
 
                     ServerService.getInstance().sendMessage(room.name, Messages.BOARD, room.game.board);
@@ -91,16 +83,20 @@ export class GameService {
         {
             name: '2',
             player: this.mapPlayer(data[1])
+        },
+        {
+            name: '3',
+            player: this.mapPlayer(room.players[2])
+        },
+        {
+            name: '4',
+            player: this.mapPlayer(room.players[3])
         }
-            // ,
-            // {
-            //     name: '3',
-            //     player: this.mapPlayer(room.players[2])
-            // }
         ]);
     }
 
     private sendUpdatedPlayers(room: Room, data: Player, message?: string) {
+        console.log("envio de mensaje");
         ServerService.getInstance().sendMessage(room.name, Messages.PLAYERS_UPDATE, {
             message: message,
             player: data,

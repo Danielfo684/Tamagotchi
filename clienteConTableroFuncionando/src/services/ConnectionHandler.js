@@ -29,8 +29,7 @@ export const ConnectionHandler = {
                 onDisconnectedCallBack();
             });
         })
-        // no he encontrado la forma de enlazar limpiamente el socket emit con 
-        // la UI y mantenerlos separados, voy a llamar al socket emit directamente en UI
+     
         
     },
     enviarCosas : (payload) => {

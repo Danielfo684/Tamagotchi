@@ -42,6 +42,7 @@ export class ServerService {
             GameService.getInstance().addPlayer(GameService.getInstance().buildPlayer(socket));
             socket.on("UPDATE_PLAYER", (data) => {
                 console.log(data);
+                console.log("UPDATE_PLAYER");
                 GameService.getInstance().updatePlayer(data);
             })
 
@@ -61,7 +62,7 @@ export class ServerService {
     }
 
     public sendMessage(room: String | null, type: String, content: any) {
-        console.log(content);
+        // console.log(content);
         if (this.active && this.io != null) {
             if (room != null) {
                 this.io?.to(room.toString()).emit("message", {

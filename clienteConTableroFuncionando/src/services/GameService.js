@@ -21,10 +21,7 @@ export class GameService {
         "NEW_PLAYER": this.do_newPlayer.bind(this),
         "BOARD": this.do_newBoard.bind(this),
         "PLAYERS_UPDATE": this.do_updatePlayers.bind(this),
-        "ASIGN_PLAYER": this.do_asignPlayer.bind(this),
         "ASIGN_MY_PLAYER": this.do_asignMyPlayer.bind(this),
-        // "SEND_UPDATE" : this.do_sendMyPlayer.bind(this)
-        // "ROOM_STATUS" : this.do_newBoard.bind(this)
         "UPDATE_PLAYER": this.do_updatePlayers.bind(this),
         "ATTACKING": this.do_attack.bind(this),
         "MOVING": this.do_move.bind(this),
@@ -74,8 +71,7 @@ export class GameService {
 
     };
 
-    async do_asignPlayer(payload) {
-    };
+
 
 
     async do_updatePlayers(payload) {
@@ -95,7 +91,7 @@ export class GameService {
             const player = this.#players.find(player => player.id === payload.player.id);
             player.x = payload.player.x;
             player.y = payload.player.y;
-            player.status = payload.player.status;
+            player.state = payload.player.state;
             player.direction = payload.player.direction;
             player.visibility = payload.player.visibility;
             let newPayload = {
@@ -110,7 +106,7 @@ export class GameService {
 
     async do_newBoard(payload) {
         this.#board.build(payload);
-        this.#ui.drawBoard(this.#board.map, this.#players);
+        this.#ui.drawBoard(this.#board.map, this.#players, this.#myPlayer);
 
 
         this.#ui.playerButtons(this.#myPlayer, ConnectionHandler.controller);
