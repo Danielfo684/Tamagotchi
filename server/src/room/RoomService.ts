@@ -30,8 +30,8 @@ export class RoomService {
             this.rooms.push(currentRoom);
             return currentRoom;
         }
-        
-         return room;
+
+        return room;
     }
 
     public addPlayer(player: Player): Room {
@@ -57,12 +57,12 @@ export class RoomService {
     }
     public getRoomByPlayerId(playerId: String): Room {
         console.log(playerId);
-         const room = this.rooms.find((room) => room.players.find((player) => player.id.id === playerId));
-         if (!room) {
+        const room = this.rooms.find((room) => room.players.find((player) => player.id.id === playerId));
+        if (!room) {
             throw new Error('Room not found for playerId');
         }
         this.updatePlayer(room, playerId);
-         return room;
+        return room;
     }
     public updatePlayer(room: Room, data: any): Room {
         room.players.forEach((player) => {
@@ -70,10 +70,18 @@ export class RoomService {
                 player.x = data.x;
                 player.y = data.y;
                 player.direction = data.direction;
-                player.state = data.state;
+                if (this.checkDefeat(room, data)) {
+                    player.state = data.state;
+                }
                 player.visibility = data.visibility;
             }
         });
         return room;
+    }
+    public checkDefeat(room: Room, player: Player): boolean {
+        if (room.players.filter((item) => (item.x == player.x) && (item.y == player.y))) {
+            return true;
+        }
+        return false;
     }
 }

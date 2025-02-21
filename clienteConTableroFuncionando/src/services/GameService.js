@@ -26,7 +26,7 @@ export class GameService {
         "ATTACKING": this.do_attack.bind(this),
         "MOVING": this.do_move.bind(this),
         "ROTATING": this.do_rotate.bind(this)
-    };
+        };
 
     constructor(ui) {
         this.#state = this.#states.WAITING;
@@ -45,6 +45,7 @@ export class GameService {
                     async () => {
                         const action = this.#queue.getMessage();
                         if (action != undefined) {
+                            console.log(action);
                             await this.#actionsList[action.type](action.content);
                         } else {
                             this.stopScheduler();
@@ -79,7 +80,6 @@ export class GameService {
             payload.forEach(item => {
                 this.#players.push(item.player);
             });
-
             this.#players.map((player, index) => {
                 player.x = this.#startingPositions[index][0];
                 player.y = this.#startingPositions[index][1];

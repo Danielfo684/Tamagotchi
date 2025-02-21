@@ -218,8 +218,8 @@ console.log(board);
             console.log("llamada a defeating");
             console.log(defeatedPlayer);
             console.log(myPlayer);
-            if (defeatedPlayer === myPlayer.id)
-                ConnectionHandler.enviarCosas(UIv1.mapPlayer({ id: defeatedPlayer }, "DEFEATING"));
+            if (defeatedPlayer === myPlayer.id) 
+                ConnectionHandler.enviarCosas(UIv1.mapPlayer( defeatedPlayer, "DEFEATING"));
         };
 
     }
@@ -248,7 +248,7 @@ console.log(board);
                 button.disabled = true;
             });
         }
-        console.log("player defeated");
+        console.log("player defeated"); 
 
         let playerImage = document.createElement('img');
         playerImage.src = `assets/images/dead.png`;
