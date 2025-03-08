@@ -7,7 +7,12 @@ import { BoardBuilder } from "./BoardBuilder";
 import { ServerService } from "../server/ServerService"
 export class GameService {
     private games: Game[];
+    // static actions = {
+    //         MOVING: this.do_move(),
+    //         ROTATING: "do_rotate",
+    //         ATTACKING: "do_attack",
 
+    // }
     private static instance: GameService;
     private constructor() {
         this.games = [];
@@ -34,9 +39,10 @@ export class GameService {
     public updatePlayer(data: any) {
         console.log(data.action);
         let room: Room = RoomService.getInstance().getRoomByPlayerId(data.player.id);
+        // if (this.checkPlayerAction(data)) {
         room = RoomService.getInstance().updatePlayer(room, data);
         this.sendUpdatedPlayers(room, data.player, data.action);
-
+    // } else (this.sendUpdatedPlayers(room, data.player, "You cannot do that"));
     }
     public addPlayer(player: Player): boolean {
         console.log(player.id.id);
@@ -84,14 +90,14 @@ export class GameService {
             name: '2',
             player: this.mapPlayer(data[1])
         },
-        {
-            name: '3',
-            player: this.mapPlayer(room.players[2])
-        },
-        {
-            name: '4',
-            player: this.mapPlayer(room.players[3])
-        }
+        // {
+        //     name: '3',
+        //     player: this.mapPlayer(room.players[2])
+        // },
+        // {
+        //     name: '4',
+        //     player: this.mapPlayer(room.players[3])
+        // }
         ]);
     }
 
@@ -113,4 +119,13 @@ export class GameService {
             visibility: player.visibility
         }
     }
+
+
+    // private checkPlayerAction(data: any) {
+    //     if (Object.keys(GameService.actions).includes(data.action))
+    //         GameService.actions[data.action]();
+    // }
+    // private do_move() {
+
+    // }
 }

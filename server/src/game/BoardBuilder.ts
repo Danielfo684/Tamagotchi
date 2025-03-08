@@ -35,7 +35,6 @@ export class BoardBuilder {
                                 probability = 2;
                             }
                             else {
-                                console.log("sube");
                                 probability += 1;
                             }
                         }

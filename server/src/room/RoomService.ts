@@ -65,6 +65,7 @@ export class RoomService {
          return room;
     }
     public updatePlayer(room: Room, data: any): Room {
+        console.log(data);  
         room.players.forEach((player) => {
             if (player.id.id === data.id) {
                 player.x = data.x;

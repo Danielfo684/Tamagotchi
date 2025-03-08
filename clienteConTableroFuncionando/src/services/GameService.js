@@ -25,7 +25,8 @@ export class GameService {
         "UPDATE_PLAYER": this.do_updatePlayers.bind(this),
         "ATTACKING": this.do_attack.bind(this),
         "MOVING": this.do_move.bind(this),
-        "ROTATING": this.do_rotate.bind(this)
+        "ROTATING": this.do_rotate.bind(this),
+        "DEFEATING": this.do_defeat.bind(this),
     };
 
     constructor(ui) {
@@ -117,14 +118,14 @@ export class GameService {
     async do_asignMyPlayer(payload) {
         if (this.#myPlayer === null) {
             this.#myPlayer = payload;
-           
+
         }
 
     }
     async do_attack(payload) {}
     async do_move(payload) {}
     async do_rotate(payload) {}
-
+    async do_defeat(payload) {}
     // async do_sendMyPlayer(payload) {
     //     ConnectionHandler.emitData("SEND_UPDATE", {
     //         player: this.#myPlayer

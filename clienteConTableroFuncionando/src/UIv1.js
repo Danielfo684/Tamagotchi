@@ -1,6 +1,7 @@
 import { UI_BUILDER } from "./Ui.js";
 import { Directions } from "./entities/Player.js";
 import { ConnectionHandler } from "./services/ConnectionHandler.js";
+import { GameService } from "./services/GameService.js";
 export const UIv1 = UI_BUILDER.init();
 
 UIv1.initUI = () => {
@@ -24,7 +25,6 @@ UIv1.elementEffects = {
 }
 
 UIv1.myPlayer = null;
-
 UIv1.drawBoard = (board, players, myPlayer) => {
 
     UIv1.myPlayer = myPlayer;
@@ -35,7 +35,7 @@ UIv1.drawBoard = (board, players, myPlayer) => {
         base.style.gridTemplateColumns = `repeat(${board.length}, 50px)`;
         base.style.gridTemplateRows = `repeat(${board.length}, 50px)`;
 
-console.log(board);
+        console.log(board);
         board = board.map(column => column.map((row) => {
             const tile = document.createElement("div");
             tile.classList.add("tile");
@@ -312,35 +312,35 @@ console.log(board);
     UIv1.do_move = (player) => {
         let playerTile = document.querySelector(`[data-player="${player.id}"]`);
         if (UIv1.checkAdjacentPlayer(player, board)) {
-            playerTile.innerHTML = '';
-            playerTile.dataset.player = '';
-            if (playerTile.dataset.element === 'bush') {
-                playerTile.style.backgroundColor = 'green';
-            }
-            else {
-                playerTile.style.backgroundColor = 'white';
-            }
-            playerTile.dataset.ocuppied = false;
+        playerTile.innerHTML = '';
+        playerTile.dataset.player = '';
+        if (playerTile.dataset.element === 'bush') {
+            playerTile.style.backgroundColor = 'green';
+        }
+        else {
+            playerTile.style.backgroundColor = 'white';
+        }
+        playerTile.dataset.ocuppied = false;
             playerTile = board[player.x][player.y];
-            const playerImage = document.createElement('img');
-            playerImage.src = `assets/images/player.png`;
+        const playerImage = document.createElement('img');
+        playerImage.src = `assets/images/player.png`;
+        if (player.id === UIv1.myPlayer.id) {
+            playerTile.style.backgroundColor = '#d2d7df';
+        }
+        playerTile.dataset.player = player.id;
+        playerTile.dataset.ocuppied = true;
+        playerTile.appendChild(playerImage);
+        UIv1.setImageRotation(player);
+        UIv1.checkElement(player, board);
+        if (player.visibility === false) {
+            playerTile.querySelector('img').style.opacity = 0;
             if (player.id === UIv1.myPlayer.id) {
-                playerTile.style.backgroundColor = '#d2d7df';
-            }
-            playerTile.dataset.player = player.id;
-            playerTile.dataset.ocuppied = true;
-            playerTile.appendChild(playerImage);
-            UIv1.setImageRotation(player);
-            UIv1.checkElement(player, board);
-            if (player.visibility === false) {
-                playerTile.querySelector('img').style.opacity = 0;
-                if (player.id === UIv1.myPlayer.id) {
-                    playerTile.querySelector('img').style.opacity = 0.2;
+                playerTile.querySelector('img').style.opacity = 0.2;
 
-                }
-            } else {
-                playerTile.querySelector('img').style.opacity = 1;
             }
+        } else {
+            playerTile.querySelector('img').style.opacity = 1;
+        }
         }
         else {
             switch (player.direction) {
