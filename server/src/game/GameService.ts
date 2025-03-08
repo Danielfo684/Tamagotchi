@@ -166,7 +166,7 @@ export class GameService {
                 this.updatePlayerData(player, room);
                 let mappedPlayer = this.mapPlayer(player);
                 this.sendUpdatedPlayers(room, mappedPlayer, "DEFEATING");
-            } else {
+                this.checkWin(room);
             }
         });
     }
@@ -180,7 +180,6 @@ export class GameService {
         switch (data.player.direction) {
             case Directions.Up:
                 nextTile = [data.player.x - 1, data.player.y];
-
                 break;
             case Directions.Right:
                 nextTile = [data.player.x, data.player.y + 1];
@@ -192,19 +191,19 @@ export class GameService {
                 nextTile = [data.player.x, data.player.y - 1];
                 break;
         }
-        let marker: Boolean = false;
+        let bandera: Boolean = false;
         if (nextTile[0] >= 0 && nextTile[0] <= 9 && nextTile[1] >= 0 && nextTile[1] <= 9) {
             room.players.forEach((player) => {
-               console.log("nos movemos!");
+                console.log("nos movemos!");
                 if (
                     (player.x === nextTile[0] && player.y === nextTile[1])
                 ) {
-                    marker = true;
+                    bandera = true;
                 }
 
             })
 
-            if (!marker) {
+            if (!bandera) {
                 data.player.x = nextTile[0];
                 data.player.y = nextTile[1];
             }
@@ -213,6 +212,7 @@ export class GameService {
             this.sendUpdatedPlayers(room, data.player, data.action);
         } else {
             console.log("no se puede mover");
+            this.sendCancelledAction(room, data.player, data.action);
         }
 
     }
@@ -228,5 +228,21 @@ export class GameService {
             }
         });
     }
-
+    public checkWin(room: Room) {
+        let contador: number = 0;
+        let winnerPlayer: Player;
+        room.players.forEach((player) => {
+            if (player.state === PlayerStates.Defeated) {
+                contador++;
+            }
+        })
+        if (contador === 1) {
+            room.players.forEach((player) => {
+                if (player.state !== PlayerStates.Defeated) {
+                    
+                    this.sendUpdatedPlayers(room, this.mapPlayer(player), "WINNING");
+                };
+            });
+        }
+    }
 }

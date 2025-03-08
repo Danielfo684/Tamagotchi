@@ -28,6 +28,7 @@ export class GameService {
         "ROTATING": this.do_rotate.bind(this),
         "DEFEATING": this.do_defeat.bind(this),
         "CANCELLED_ACTION": this.do_cancelledAction.bind(this),
+        "WINNING": this.do_win.bind(this),
     };
 
     constructor(ui) {
@@ -126,7 +127,11 @@ export class GameService {
     }
     async do_cancelledAction(payload) {
         console.log("Action cancelled");
-        // this.#ui.showCancelMessage();
+        this.#ui.showCancelMessage();
+    }
+    async do_win(payload) {
+        console.log("You win!");
+        this.#ui.showVictory();
     }
     async do_attack(payload) {}
     async do_move(payload) {}

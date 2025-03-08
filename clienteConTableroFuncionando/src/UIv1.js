@@ -29,9 +29,9 @@ UIv1.drawBoard = (board, players, myPlayer) => {
 
     UIv1.myPlayer = myPlayer;
     if (board !== undefined) {
-
         const base = document.getElementById(UIv1.uiElements.board);
         base.innerHTML = '';
+
         base.style.gridTemplateColumns = `repeat(${board.length}, 50px)`;
         base.style.gridTemplateRows = `repeat(${board.length}, 50px)`;
 
@@ -49,7 +49,7 @@ UIv1.drawBoard = (board, players, myPlayer) => {
             anime({
                 targets: tile,
                 opacity: [0, 1],
-                duration: (Math.random() * 1000) + 1000,
+                duration: (Math.random() * 100) + 1000,
                 easing: 'easeInOutQuad'
             });
             return tile;
@@ -68,6 +68,29 @@ UIv1.drawBoard = (board, players, myPlayer) => {
             }
         })
 
+        const countDownTexts = ['3', '2', '1', 'YA!'];
+        const startingCountDown = document.createElement('div');
+        const countDownP = document.createElement('p');
+        startingCountDown.classList.add('starting-countdown');
+        startingCountDown.appendChild(countDownP);
+        base.appendChild(startingCountDown);
+        countDownP.innerText = countDownTexts[0];
+        let contador = 1;
+        const countDownInterval = setInterval(() => {
+            countDownP.innerText = countDownTexts[contador];
+            contador++;
+            if (contador >= countDownTexts.length) {
+                //!!!! clearInterval te permite parar intervalos
+                clearInterval(countDownInterval);
+                startingCountDown.style.opacity = 0;
+                setTimeout(() => {
+                    startingCountDown.remove();
+                    document.getElementById('attack').disabled = false;
+                    document.getElementById('rotate').disabled = false;
+                    document.getElementById('advance').disabled = false;
+                }, 1000);
+            }
+        }, 1000);
 
         ConnectionHandler.sendStartingBoard(board);
 
@@ -79,16 +102,19 @@ UIv1.drawBoard = (board, players, myPlayer) => {
         let playerTile = board[player.x][player.y];
 
         const attackButton = document.createElement('button');
+        attackButton.id = 'attack';
         const swordIcon = document.createElement('img');
         swordIcon.src = 'assets/images/sword.png';
         attackButton.appendChild(swordIcon);
 
         const advanceButton = document.createElement('button');
+        advanceButton.id = 'advance';
         const moveIcon = document.createElement('img');
         moveIcon.src = 'assets/images/movement.png';
         advanceButton.appendChild(moveIcon);
 
         const rotateButton = document.createElement('button');
+        rotateButton.id = 'rotate';
         const rotateIcon = document.createElement('img');
         rotateIcon.src = 'assets/images/rotate-right.png';
         rotateButton.appendChild(rotateIcon);
@@ -101,7 +127,9 @@ UIv1.drawBoard = (board, players, myPlayer) => {
         buttonContainer.appendChild(rotateButton);
 
         document.body.appendChild(buttonContainer);
-
+        attackButton.disabled = true;
+        rotateButton.disabled = true;
+        advanceButton.disabled = true;
 
         advanceButton.addEventListener('click', () => {
             attackButton.disabled = true;
@@ -422,19 +450,37 @@ UIv1.drawBoard = (board, players, myPlayer) => {
             }
         }
     }
+    UIv1.showVictory = () => {
+        const message = document.createElement('div');
+        const boardDiv = document.getElementById('board');
+        message.classList.add('victory-message');
+        message.textContent = 'YOU WIN!';
 
-    // UIv1.showCancelMessage = () => {
-    //     const message = document.createElement('div');
-    //     message.classList.add('alert');
-    //     message.style.opacity = 0.5;
-    //     document.body.appendChild(message);
-    // setTimeout(() => {
-    //     message.style.opacity = 0;
-    // }, 10);
-    //     setTimeout(() => {
-    //         document.body.removeChild(message);
-    //     }, 1000);
-    // }
+        boardDiv.appendChild(message);
+        document.querySelectorAll('button').forEach(button => {
+            button.disabled = true;
+        });
+        const newGameButton = document.createElement('button');
+        newGameButton.textContent = 'New Game';
+        newGameButton.addEventListener('click', () => {
+            location.reload();
+        });
+        message.appendChild(newGameButton);
+
+    }
+    UIv1.showCancelMessage = () => {
+        const message = document.createElement('div');
+        let boardDiv = document.getElementById('board');
+        message.classList.add('alert');
+        message.style.opacity = 0.8;
+        boardDiv.appendChild(message);
+        setTimeout(() => {
+            message.style.opacity = 0;
+        }, 10);
+        setTimeout(() => {
+            boardDiv.removeChild(message);
+        }, 500);
+    }
 }
 UIv1.drawBoard();
 

@@ -16,6 +16,7 @@ export enum Messages {
     MOVE = "MOVE",
     ROTATE = "ROTATE",
     CANCELLED_ACTION = "CANCELLED_ACTION",
+    WINNING = "WINNING",
 }
 
 export interface Game {
