@@ -114,26 +114,26 @@ UIv1.drawBoard = (board, players, myPlayer) => {
             }, 100);
             let x = player.x;
             let y = player.y;
-            switch (player.direction) {
-                case Directions.Up:
+            // switch (player.direction) {
+            //     case Directions.Up:
 
-                    if (x > 0) --x;
-                    break;
-                case Directions.Right:
-                    if (y < 9)
-                        ++y;
-                    break;
-                case Directions.Down:
-                    if (x <= 8)
+            //         if (x > 0) --x;
+            //         break;
+            //     case Directions.Right:
+            //         if (y < 9)
+            //             ++y;
+            //         break;
+            //     case Directions.Down:
+            //         if (x <= 8)
 
-                        ++x;
-                    break;
-                case Directions.Left:
-                    if (y > 0)
+            //             ++x;
+            //         break;
+            //     case Directions.Left:
+            //         if (y > 0)
 
-                        --y;
-                    break;
-            }
+            //             --y;
+            //         break;
+            // }
             // if (board[x][y].dataset.ocuppied === 'true') {
             //     console.log('Tile is occupied');
             // } else {

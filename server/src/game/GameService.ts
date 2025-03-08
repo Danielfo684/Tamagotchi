@@ -192,19 +192,28 @@ export class GameService {
                 nextTile = [data.player.x, data.player.y - 1];
                 break;
         }
+        let marker: Boolean = false;
+        if (nextTile[0] >= 0 && nextTile[0] <= 9 && nextTile[1] >= 0 && nextTile[1] <= 9) {
+            room.players.forEach((player) => {
+               console.log("nos movemos!");
+                if (
+                    (player.x === nextTile[0] && player.y === nextTile[1])
+                ) {
+                    marker = true;
+                }
 
-        room.players.forEach((player) => {
-            if (
-                player.id.id !== data.player.id
-                // player.x === nextTile[0] && player.y === nextTile[1]
-            ) {
-                this.updatePlayerData(data.player, room);
-                RoomService.getInstance().updatePlayer(room, data);
-                this.sendUpdatedPlayers(room, data.player, data.action);
+            })
+
+            if (!marker) {
+                data.player.x = nextTile[0];
+                data.player.y = nextTile[1];
             }
-
-        })
-            ;
+            this.updatePlayerData(data.player, room);
+            RoomService.getInstance().updatePlayer(room, data);
+            this.sendUpdatedPlayers(room, data.player, data.action);
+        } else {
+            console.log("no se puede mover");
+        }
 
     }
 
