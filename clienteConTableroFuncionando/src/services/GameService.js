@@ -89,6 +89,7 @@ export class GameService {
             this.#myPlayer = this.#players.find(player =>
                 player.id === this.#myPlayer.player.id);
         } else {
+            console.log(payload);
             const player = this.#players.find(player => player.id === payload.player.id);
             player.x = payload.player.x;
             player.y = payload.player.y;

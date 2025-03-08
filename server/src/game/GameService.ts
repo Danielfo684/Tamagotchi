@@ -45,8 +45,10 @@ export class GameService {
 
         let room: Room = RoomService.getInstance().getRoomByPlayerId(data.player.id);
         if (this.actions[data.action]) {
+            console.log("existe la acción");
             this.actions[data.action](data);
         } else {
+            console.log("no existe la acción");
             this.sendCancelledAction(room, data.player, data.action);
         }
     }
@@ -113,7 +115,7 @@ export class GameService {
         });
     };
 
-    private sendUpdatedPlayers(room: Room, data: Player, message?: string) {
+    private sendUpdatedPlayers(room: Room, data: any, message?: string) {
         console.log("envio de mensaje");
         ServerService.getInstance().sendMessage(room.name, Messages.PLAYERS_UPDATE, {
             message: message,
@@ -143,6 +145,7 @@ export class GameService {
         this.sendUpdatedPlayers(room, data.player, data.action);
     }
     public check_attack(data: any) {
+        console.log("ATAQUE");
         let room: Room = RoomService.getInstance().getRoomByPlayerId(data.player.id);
         let x = data.player.x;
         let y = data.player.y;
@@ -160,30 +163,33 @@ export class GameService {
                 --y;
                 break;
         }
+        console.log("CASILLA DE KILL")
+        console.log(x);
+        console.log(y);
         room.players.forEach((player) => {
-            console.log("AQUI");
+            console.log("POSICION REAL DEL ASESINADO");
             console.log(player.x);
-            if (player.x === x && player.y === y) {
+            console.log(player.y);
+           
+            if (player.x === x && player.y === y && player.state !== PlayerStates.Defeated) {
                 player.state = PlayerStates.Defeated;
-                this.sendUpdatedPlayers(room, player, "DEFEATING");
+                this.updatePlayerData(player, room);
+                let mappedPlayer = this.mapPlayer(player);
+                this.sendUpdatedPlayers(room, mappedPlayer, "DEFEATING");
                 console.log("AQUI DOS");
-            } else (console.log("no hay nadie"));
+            } else {
+                console.log("no hay nadie");
+            }
         });
-
-
-        room = RoomService.getInstance().updatePlayer(room, data);
-        this.sendUpdatedPlayers(room, data.player, data.action);
     }
+    
     public check_move(data: any) {
         let room: Room = RoomService.getInstance().getRoomByPlayerId(data.player.id);
-        
         this.updatePlayerData(data.player, room);
-        room = RoomService.getInstance().updatePlayer(room, data);
+        RoomService.getInstance().updatePlayer(room, data);
         this.sendUpdatedPlayers(room, data.player, data.action);
-        room.players.forEach((player) => {
-            console.log(player.x);
-        });
     }
+    
     public updatePlayerData(player: Player, room: Room) {
         room.players.forEach((serverPlayer) => {
             if (serverPlayer.id.id === player.id.id) {
@@ -193,9 +199,7 @@ export class GameService {
                 serverPlayer.direction = player.direction;
                 serverPlayer.visibility = player.visibility;
             }
-            return serverPlayer;
         });
-
     }
 
 }

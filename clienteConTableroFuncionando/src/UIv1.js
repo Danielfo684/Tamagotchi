@@ -54,7 +54,7 @@ UIv1.drawBoard = (board, players, myPlayer) => {
             });
             return tile;
         }));
-console.log(board);
+        console.log(board);
 
         players.forEach(player => {
             const playerTile = board[player.x][player.y];
@@ -173,6 +173,18 @@ console.log(board);
             let playerTile = board[player.x][player.y];
             if (playerTile.dataset.element !== 'bush') {
                 ConnectionHandler.updatePlayer(UIv1.mapPlayer(player, 'ATTACKING'));
+                anime({
+                    targets: playerTile.querySelector('img'),
+                    translateX: [0, 50],
+                    duration: 300,
+                    easing: 'easeInOutQuad'
+                });
+                anime({
+                    targets: playerTile.querySelector('img'),
+                    translateX: [50, 0],
+                    duration: 300,
+                    easing: 'easeInOutQuad'
+                });
             }
         });
     }
@@ -201,18 +213,7 @@ console.log(board);
                 --y;
                 break;
         }
-        anime({
-            targets: playerTile.querySelector('img'),
-            translateX: [0, 50],
-            duration: 300,
-            easing: 'easeInOutQuad'
-        });
-        anime({
-            targets: playerTile.querySelector('img'),
-            translateX: [50, 0],
-            duration: 300,
-            easing: 'easeInOutQuad'
-        });
+
 
 
     }
@@ -383,8 +384,6 @@ console.log(board);
     UIv1.mapPlayer = (player, message, x, y) => {
         let payload = { ...player };
         if (message === 'DEFEATING') {
-
-
             payload.state = 'DEFEATED';
         }
 

@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 3000;
 const httpServer = http.createServer();
 ServerService.getInstance().init(httpServer);
 
+
 app.get('/', async (req: Request, res: Response): Promise<Response> => {
     return res.status(200).send({
         message: 'Hello World!',
