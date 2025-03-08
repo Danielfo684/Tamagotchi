@@ -77,7 +77,6 @@ export class GameService {
                 if (ServerService.getInstance().isActive()) {
 
 
-                    console.log(room.players);
                     this.sendStartingPlayers(room, room.players);
 
                     ServerService.getInstance().sendMessage(room.name, Messages.BOARD, room.game.board);
@@ -134,10 +133,7 @@ export class GameService {
         }
     }
 
-    public setStartingBoard(data: any) {
-        console.log(data);
 
-    }
 
     public check_rotate(data: any) {
         let room: Room = RoomService.getInstance().getRoomByPlayerId(data.player.id);
@@ -163,33 +159,55 @@ export class GameService {
                 --y;
                 break;
         }
-        console.log("CASILLA DE KILL")
-        console.log(x);
-        console.log(y);
+
         room.players.forEach((player) => {
-            console.log("POSICION REAL DEL ASESINADO");
-            console.log(player.x);
-            console.log(player.y);
-           
             if (player.x === x && player.y === y && player.state !== PlayerStates.Defeated) {
                 player.state = PlayerStates.Defeated;
                 this.updatePlayerData(player, room);
                 let mappedPlayer = this.mapPlayer(player);
                 this.sendUpdatedPlayers(room, mappedPlayer, "DEFEATING");
-                console.log("AQUI DOS");
             } else {
-                console.log("no hay nadie");
             }
         });
     }
-    
+
     public check_move(data: any) {
         let room: Room = RoomService.getInstance().getRoomByPlayerId(data.player.id);
-        this.updatePlayerData(data.player, room);
-        RoomService.getInstance().updatePlayer(room, data);
-        this.sendUpdatedPlayers(room, data.player, data.action);
+        let nextTile: Array<number> = [];
+        console.log(data.player.direction);
+        console.log(data.player.x);
+        console.log(data.player.y);
+        switch (data.player.direction) {
+            case Directions.Up:
+                nextTile = [data.player.x - 1, data.player.y];
+
+                break;
+            case Directions.Right:
+                nextTile = [data.player.x, data.player.y + 1];
+                break;
+            case Directions.Down:
+                nextTile = [data.player.x + 1, data.player.y];
+                break;
+            case Directions.Left:
+                nextTile = [data.player.x, data.player.y - 1];
+                break;
+        }
+
+        room.players.forEach((player) => {
+            if (
+                player.id.id !== data.player.id
+                // player.x === nextTile[0] && player.y === nextTile[1]
+            ) {
+                this.updatePlayerData(data.player, room);
+                RoomService.getInstance().updatePlayer(room, data);
+                this.sendUpdatedPlayers(room, data.player, data.action);
+            }
+
+        })
+            ;
+
     }
-    
+
     public updatePlayerData(player: Player, room: Room) {
         room.players.forEach((serverPlayer) => {
             if (serverPlayer.id.id === player.id.id) {

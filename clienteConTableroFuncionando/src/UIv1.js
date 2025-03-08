@@ -341,22 +341,22 @@ UIv1.drawBoard = (board, players, myPlayer) => {
                 playerTile.querySelector('img').style.opacity = 1;
             }
         }
-        else {
-            switch (player.direction) {
-                case Directions.Up:
-                    if (player.x > 0) ++player.x;
-                    break;
-                case Directions.Right:
-                    if (player.y < 9) --player.y;
-                    break;
-                case Directions.Down:
-                    if (player.x < 9) --player.x;
-                    break;
-                case Directions.Left:
-                    ++player.y;
-                    break;
-            }
-        }
+        // else {
+        //     switch (player.direction) {
+        //         case Directions.Up:
+        //             if (player.x > 0) ++player.x;
+        //             break;
+        //         case Directions.Right:
+        //             if (player.y < 9) --player.y;
+        //             break;
+        //         case Directions.Down:
+        //             if (player.x < 9) --player.x;
+        //             break;
+        //         case Directions.Left:
+        //             ++player.y;
+        //             break;
+        //     }
+        // }
 
     }
 
@@ -422,6 +422,19 @@ UIv1.drawBoard = (board, players, myPlayer) => {
             }
         }
     }
+
+    // UIv1.showCancelMessage = () => {
+    //     const message = document.createElement('div');
+    //     message.classList.add('alert');
+    //     message.style.opacity = 0.5;
+    //     document.body.appendChild(message);
+    // setTimeout(() => {
+    //     message.style.opacity = 0;
+    // }, 10);
+    //     setTimeout(() => {
+    //         document.body.removeChild(message);
+    //     }, 1000);
+    // }
 }
 UIv1.drawBoard();
 
