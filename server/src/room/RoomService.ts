@@ -5,6 +5,7 @@ import { Room, RoomConfig } from "./entities/Room";
 export class RoomService {
     private rooms: Room[];
     private static instance: RoomService;
+ 
     private constructor() {
         this.rooms = [];
     };
@@ -25,7 +26,7 @@ export class RoomService {
                 name: "room" + genRanHex(128),
                 players: [],
                 occupied: false,
-                game: null
+                game: null,
             }
             this.rooms.push(currentRoom);
             return currentRoom;
@@ -55,26 +56,37 @@ export class RoomService {
         //     }
         // });
     }
-    public getRoomByPlayerId(playerId: String): Room {
+    public getRoomByPlayerId(playerId: String): any {
         console.log(playerId);
-         const room = this.rooms.find((room) => room.players.find((player) => player.id.id === playerId));
-         if (!room) {
-            throw new Error('Room not found for playerId');
-        }
-        this.updatePlayer(room, playerId);
-         return room;
+        const room = this.rooms.find((room) => room.players.find((player) => player.id.id === playerId));
+       
+      // nota para futuros códigos: antes la función devolvía Room, por lo que si no encontraba la room no me dejaba 
+      // hacer return null y me obligaba a hacer un try catch, ahora devuelve any y puedo hacer return null
+        if (!room) {
+        return null;
     }
-    public updatePlayer(room: Room, data: any): Room {
-        console.log(data);  
-        room.players.forEach((player) => {
-            if (player.id.id === data.id) {
-                player.x = data.x;
-                player.y = data.y;
-                player.direction = data.direction;
-                player.state = data.state;
-                player.visibility = data.visibility;
-            }
-        });
         return room;
     }
+    public updatePlayer(room: Room, data: any): Room {
+      
+    
+        console.log("datos de los jugadores");
+        console.log(data.player.id);
+    
+        room.players.forEach((player) => {
+            if (player.id.id === data.player.id) {
+                player.x = data.player.x;
+                player.y = data.player.y;
+                player.direction = data.player.direction;
+                player.state = data.player.state;
+                player.visibility = data.player.visibility;
+            }
+            console.log("datos actualizados del player en room");
+            console.log(player.x);
+            console.log(player.y);
+        });
+    
+        return room;
+    }
+
 }

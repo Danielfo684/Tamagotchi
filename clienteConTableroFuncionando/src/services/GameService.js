@@ -9,7 +9,7 @@ export class GameService {
     };
     #ui = null;
     #players = [];
-    #board = null;
+    board = null;
     #queue = null;
     #state = null;
     #parallel = null;
@@ -31,7 +31,7 @@ export class GameService {
 
     constructor(ui) {
         this.#state = this.#states.WAITING;
-        this.#board = new Board();
+        this.board = new Board();
         this.#queue = new Queue();
         this.#parallel = null;
         this.checkScheduler();
@@ -106,8 +106,8 @@ export class GameService {
     };
 
     async do_newBoard(payload) {
-        this.#board.build(payload);
-        this.#ui.drawBoard(this.#board.map, this.#players, this.#myPlayer);
+        this.board.build(payload);
+        this.#ui.drawBoard(this.board.map, this.#players, this.#myPlayer);
 
 
         this.#ui.playerButtons(this.#myPlayer, ConnectionHandler.controller);

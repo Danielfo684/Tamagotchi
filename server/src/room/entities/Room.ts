@@ -1,3 +1,4 @@
+import { Board } from "../../game/entities/Board";
 import { Game } from "../../game/entities/Game";
 import { Player } from "../../player/entities/Player";
 

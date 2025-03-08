@@ -14,7 +14,8 @@ export enum Messages {
     ASIGN_MY_PLAYER = "ASIGN_MY_PLAYER",
     ATTACK = "ATTACK",
     MOVE = "MOVE",
-    ROTATE = "ROTATE"
+    ROTATE = "ROTATE",
+    CANCELLED_ACTION = "CANCELLED_ACTION",
 }
 
 export interface Game {

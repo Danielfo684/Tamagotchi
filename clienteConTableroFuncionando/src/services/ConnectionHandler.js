@@ -32,8 +32,11 @@ export const ConnectionHandler = {
      
         
     },
-    enviarCosas : (payload) => {
+    updatePlayer : (payload) => {
         ConnectionHandler.socket.emit("UPDATE_PLAYER", payload);
+    },
+    sendStartingBoard : (payload) => {
+        ConnectionHandler.socket.emit("STARTING_BOARD", payload);
     }
 }
 

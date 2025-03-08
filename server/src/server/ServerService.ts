@@ -44,8 +44,10 @@ export class ServerService {
                 console.log(data);
                 console.log("UPDATE_PLAYER");
                 GameService.getInstance().updatePlayer(data);
-            })
-
+            });
+            socket.on("STARTING_BOARD", (data) => {
+                // GameService.getInstance().setStartingBoard(data);
+            });
             socket.on('disconnect', () => {
                 console.log('Un cliente se ha desconectado:', socket.id);
                 RoomService.getInstance().removePlayer(socket.id);

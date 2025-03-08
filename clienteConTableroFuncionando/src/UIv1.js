@@ -54,7 +54,7 @@ UIv1.drawBoard = (board, players, myPlayer) => {
             });
             return tile;
         }));
-
+console.log(board);
 
         players.forEach(player => {
             const playerTile = board[player.x][player.y];
@@ -69,6 +69,7 @@ UIv1.drawBoard = (board, players, myPlayer) => {
         })
 
 
+        ConnectionHandler.sendStartingBoard(board);
 
     }
 
@@ -139,7 +140,7 @@ UIv1.drawBoard = (board, players, myPlayer) => {
             player.x = x;
             player.y = y;
             // }
-            ConnectionHandler.enviarCosas(UIv1.mapPlayer(player, "MOVING", x, y));
+            ConnectionHandler.updatePlayer(UIv1.mapPlayer(player, "MOVING", x, y));
         });
 
 
@@ -153,7 +154,7 @@ UIv1.drawBoard = (board, players, myPlayer) => {
                 advanceButton.disabled = false;
             }, 100);
 
-            ConnectionHandler.enviarCosas(UIv1.mapPlayer(player, "ROTATING"));
+            ConnectionHandler.updatePlayer(UIv1.mapPlayer(player, "ROTATING"));
 
 
         });
@@ -171,12 +172,12 @@ UIv1.drawBoard = (board, players, myPlayer) => {
             }, 200);
             let playerTile = board[player.x][player.y];
             if (playerTile.dataset.element !== 'bush') {
-                ConnectionHandler.enviarCosas(UIv1.mapPlayer(player, 'ATTACKING'));
+                ConnectionHandler.updatePlayer(UIv1.mapPlayer(player, 'ATTACKING'));
             }
         });
     }
     UIv1.do_rotate = (player) => {
-        
+
         let playerImage = board[player.x][player.y].querySelector('img');
         playerImage.style.transform = UIv1.setImageRotation(player, playerImage);
     }
@@ -189,6 +190,7 @@ UIv1.drawBoard = (board, players, myPlayer) => {
         switch (player.direction) {
             case Directions.Up:
                 --x;
+                break;
             case Directions.Right:
                 ++y;
                 break;
@@ -211,7 +213,7 @@ UIv1.drawBoard = (board, players, myPlayer) => {
             duration: 300,
             easing: 'easeInOutQuad'
         });
-        
+
 
     }
     UIv1.do_action = (player, message) => {
@@ -290,17 +292,11 @@ UIv1.drawBoard = (board, players, myPlayer) => {
         }
         return true;
     }
-    UIv1.checkAdjacentPlayer = (player, board) => {
-        if (board[player.x][player.y].dataset.ocuppied === 'true') {
-            console.log('Tile is occupied');
-
-            return false;
-        }
-        return true;
-    }
 
     UIv1.do_move = (player) => {
         let previousTile;
+        let playerTile = board[player.x][player.y];
+
         switch (player.direction) {
             case Directions.Up:
                 previousTile = board[player.x + 1][player.y];
@@ -314,34 +310,35 @@ UIv1.drawBoard = (board, players, myPlayer) => {
             case Directions.Left:
                 previousTile = board[player.x][player.y + 1];
                 break;
-        }        if (UIv1.checkAdjacentPlayer(player, board)) {
-        previousTile.innerHTML = '';
-        if (previousTile.dataset.element === 'bush') {
-            previousTile.style.backgroundColor = 'green';
         }
-        else {
-            previousTile.style.backgroundColor = 'white';
-        }
-        previousTile.dataset.ocuppied = false;
-            let playerTile = board[player.x][player.y];
-        const playerImage = document.createElement('img');
-        playerImage.src = `assets/images/player.png`;
-        if (player.id === UIv1.myPlayer.id) {
-            playerTile.style.backgroundColor = '#d2d7df';
-        }
-        playerTile.dataset.ocuppied = true;
-        playerTile.appendChild(playerImage);
-        UIv1.setImageRotation(player);
-        UIv1.checkElement(player, board);
-        if (player.visibility === false) {
-            playerTile.querySelector('img').style.opacity = 0;
-            if (player.id === UIv1.myPlayer.id) {
-                playerTile.querySelector('img').style.opacity = 0.2;
-
+        console.log(playerTile.dataset.ocuppied);
+        if (playerTile.dataset.ocuppied === 'false') {
+            previousTile.innerHTML = '';
+            if (previousTile.dataset.element === 'bush') {
+                previousTile.style.backgroundColor = 'green';
             }
-        } else {
-            playerTile.querySelector('img').style.opacity = 1;
-        }
+            else {
+                previousTile.style.backgroundColor = 'white';
+            }
+            previousTile.dataset.ocuppied = false;
+            const playerImage = document.createElement('img');
+            playerImage.src = `assets/images/player.png`;
+            if (player.id === UIv1.myPlayer.id) {
+                playerTile.style.backgroundColor = '#d2d7df';
+            }
+            playerTile.dataset.ocuppied = true;
+            playerTile.appendChild(playerImage);
+            UIv1.setImageRotation(player);
+            UIv1.checkElement(player, board);
+            if (player.visibility === false) {
+                playerTile.querySelector('img').style.opacity = 0;
+                if (player.id === UIv1.myPlayer.id) {
+                    playerTile.querySelector('img').style.opacity = 0.2;
+
+                }
+            } else {
+                playerTile.querySelector('img').style.opacity = 1;
+            }
         }
         else {
             switch (player.direction) {
@@ -359,7 +356,6 @@ UIv1.drawBoard = (board, players, myPlayer) => {
                     break;
             }
         }
-
 
     }
 
