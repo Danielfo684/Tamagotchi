@@ -45,9 +45,6 @@ export class ServerService {
                 console.log("UPDATE_PLAYER");
                 GameService.getInstance().updatePlayer(data);
             });
-            socket.on("STARTING_BOARD", (data) => {
-                // GameService.getInstance().setStartingBoard(data);
-            });
             socket.on('disconnect', () => {
                 console.log('Un cliente se ha desconectado:', socket.id);
                 RoomService.getInstance().removePlayer(socket.id);
@@ -74,9 +71,6 @@ export class ServerService {
         }
     }
 
-    public gameStartMessage() {
-        //
-    }
 
     public isActive() {
         return this.active;
@@ -86,4 +80,3 @@ export class ServerService {
 }
 
 
-//Fallo de concepto tengo que enviar a donde quiere moverse el jugador no la posicion del jugador

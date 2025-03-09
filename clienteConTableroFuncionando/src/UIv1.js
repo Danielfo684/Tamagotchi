@@ -14,6 +14,7 @@ UIv1.actionsList = {
     "ATTACKING": (player) => UIv1.do_attack(player),
     "ROTATING": (player) => UIv1.do_rotate(player),
     "DEFEATING": (player) => UIv1.do_defeatPlayer(player),
+    "WINNING": () => UIv1.showVictory(),
 };
 UIv1.elementEffects = {
     "bush": (player) => {
@@ -265,7 +266,6 @@ UIv1.drawBoard = (board, players, myPlayer) => {
 
         }
         if (player.id === UIv1.myPlayer.id) {
-            alert('You have been defeated');
             document.querySelectorAll('button').forEach(button => {
                 button.disabled = true;
             });
@@ -455,6 +455,25 @@ UIv1.drawBoard = (board, players, myPlayer) => {
         const boardDiv = document.getElementById('board');
         message.classList.add('victory-message');
         message.textContent = 'YOU WIN!';
+
+        boardDiv.appendChild(message);
+        document.querySelectorAll('button').forEach(button => {
+            button.disabled = true;
+        });
+       
+        const newGameButton = document.createElement('button');
+        newGameButton.textContent = 'New Game';
+        newGameButton.addEventListener('click', () => {
+            location.reload();
+        });
+        message.appendChild(newGameButton);
+
+    }
+    UIv1.showDefeat = () => {
+        const message = document.createElement('div');
+        const boardDiv = document.getElementById('board');
+        message.classList.add('victory-message');
+        message.textContent = 'YOU LOOSE!';
 
         boardDiv.appendChild(message);
         document.querySelectorAll('button').forEach(button => {

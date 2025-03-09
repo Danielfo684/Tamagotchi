@@ -97,14 +97,14 @@ export class GameService {
             name: '2',
             player: this.mapPlayer(data[1])
         },
-            // {
-            //     name: '3',
-            //     player: this.mapPlayer(room.players[2])
-            // },
-            // {
-            //     name: '4',
-            //     player: this.mapPlayer(room.players[3])
-            // }
+            {
+                name: '3',
+                player: this.mapPlayer(data[2])
+            },
+            {
+                name: '4',
+                player: this.mapPlayer(data[3])
+            }
         ]);
     }
     private sendCancelledAction(room: Room, data: Player, action: string) {

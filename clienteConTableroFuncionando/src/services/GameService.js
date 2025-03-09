@@ -26,7 +26,7 @@ export class GameService {
         "ATTACKING": this.do_attack.bind(this),
         "MOVING": this.do_move.bind(this),
         "ROTATING": this.do_rotate.bind(this),
-        "DEFEATING": this.do_defeat.bind(this),
+         "DEFEATING": this.do_defeat.bind(this),
         "CANCELLED_ACTION": this.do_cancelledAction.bind(this),
         "WINNING": this.do_win.bind(this),
     };
@@ -130,17 +130,23 @@ export class GameService {
         this.#ui.showCancelMessage();
     }
     async do_win(payload) {
+        if (payload.id === this.#myPlayer)
         console.log("You win!");
         this.#ui.showVictory();
     }
+
+
+    //Métodos únicamente planteados para implementar nuevas acciones si hicese falta.
+    //En un primer momento se encargaban de hacer ciertas comprobaciones, pero al trasladar la mayoría al servidor
+    // se han quedado vacías.
     async do_attack(payload) {}
     async do_move(payload) {}
     async do_rotate(payload) {}
-    async do_defeat(payload) {}
-    // async do_sendMyPlayer(payload) {
-    //     ConnectionHandler.emitData("SEND_UPDATE", {
-    //         player: this.#myPlayer
-    //     });
-    // }
+
+    async do_defeat(payload) {
+        if(payload.id === this.#myPlayer)
+        this.#ui.showDefeat();
+    }
+    
 
 }

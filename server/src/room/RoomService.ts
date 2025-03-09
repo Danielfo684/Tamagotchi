@@ -48,13 +48,7 @@ export class RoomService {
             room.players = room.players.filter((item) => item.id.id !== playerId);
         });
 
-        //  this.rooms.find((room) => {room.players.find(player.id.id)});
-        //     if (room) {
-        //         room.players = room.players.filter((item) => item !== player);
-
-        //        this.rooms.push(room);
-        //     }
-        // });
+    
     }
     public getRoomByPlayerId(playerId: String): any {
         const room = this.rooms.find((room) => room.players.find((player) => player.id.id === playerId));
