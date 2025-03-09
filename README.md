@@ -30,7 +30,7 @@ Cabe destacar la función updatePlayerData, que es un mapeo de entidad a entidad
 
 En RoomService se gestionan los cambios de jugadores en una sala. Tiene funciones para añadir jugadores, encontrarlos por su Id, actualizarlos siguiendo un mapeo de entidad a entidad y eliminarlos. Esta última función destaca un poco más por usar filter, que crea un array nuevo solo con los elementos que pasan el filtro. En este caso se crea un array nuevo con todos los jugadores menos el que entra por parámetro.
 
-![alt text](./catpuras/filter.png)
+![alt text](./capturas/filter.png)
 
 ### BoardBuilder
 
